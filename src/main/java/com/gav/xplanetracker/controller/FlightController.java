@@ -55,7 +55,7 @@ public class FlightController {
 
         final Task<Flight> loadFlightDataTask = new Task<>() {
             @Override
-            protected Flight call() throws Exception {
+            protected Flight call() {
                 return flightService.startFlight();
             }
 

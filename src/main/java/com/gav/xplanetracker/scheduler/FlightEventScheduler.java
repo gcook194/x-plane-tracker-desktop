@@ -47,6 +47,7 @@ public class FlightEventScheduler {
     }
 
     public void stopFetching() {
+        System.out.println(this.getClass().getName() + " Stopping scheduler");
         scheduler.shutdownNow();
     }
 
