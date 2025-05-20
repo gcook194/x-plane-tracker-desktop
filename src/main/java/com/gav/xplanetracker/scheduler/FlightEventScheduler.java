@@ -1,5 +1,6 @@
 package com.gav.xplanetracker.scheduler;
 
+import com.gav.xplanetracker.service.EventService;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.XPlaneService;
 
@@ -14,10 +15,12 @@ public class FlightEventScheduler {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final FlightService flightService;
     private final XPlaneService xPlaneService;
+    private final EventService eventService;
 
     public FlightEventScheduler() {
         this.flightService = FlightService.getInstance();
         this.xPlaneService = XPlaneService.getInstance();
+        this.eventService = EventService.getInstance();
     }
 
     public static FlightEventScheduler getInstance() {
@@ -35,10 +38,10 @@ public class FlightEventScheduler {
                     return;
                 }
 
-//                flightService.getCurrentFlight().ifPresentOrElse(
-//                        eventService::create,
-//                        () -> System.out.println("No flights in progress - no events created")
-//                );
+                flightService.getCurrentFlight().ifPresentOrElse(
+                        eventService::create,
+                        () -> System.out.println("No flights in progress - no events created")
+                );
 
             } catch (Exception e) {
                 e.printStackTrace();

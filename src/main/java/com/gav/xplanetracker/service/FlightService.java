@@ -4,6 +4,7 @@ import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.model.Flight;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public final class FlightService {
 
@@ -39,5 +40,9 @@ public final class FlightService {
         // send message to aws
 
         return flight;
+    }
+
+    public Optional<Flight> getCurrentFlight() {
+        return Optional.of(new Flight());
     }
 }
