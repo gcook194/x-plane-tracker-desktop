@@ -11,4 +11,6 @@ module com.gav.xplanetracker {
     exports com.gav.xplanetracker;
     exports com.gav.xplanetracker.controller;
     opens com.gav.xplanetracker.controller to javafx.fxml;
+    exports com.gav.xplanetracker.scheduler;
+    opens com.gav.xplanetracker.scheduler to javafx.fxml;
 }

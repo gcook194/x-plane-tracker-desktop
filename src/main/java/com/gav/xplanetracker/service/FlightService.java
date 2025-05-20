@@ -3,15 +3,22 @@ package com.gav.xplanetracker.service;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.model.Flight;
 
-import java.io.IOException;
 import java.time.Instant;
 
-public class FlightService {
+public final class FlightService {
 
-    private NavigraphService navigraphService;
+    private static FlightService INSTANCE;
+    private final NavigraphService navigraphService;
 
     public FlightService() {
-        this.navigraphService = new NavigraphService();
+        this.navigraphService = NavigraphService.getInstance();
+    }
+
+    public static FlightService getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new FlightService();
+        }
+        return INSTANCE;
     }
 
     public Flight startFlight() {

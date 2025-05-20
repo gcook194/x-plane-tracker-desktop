@@ -15,7 +15,7 @@ public class FlightController {
     private final FlightService flightService;
 
     public FlightController() {
-        this.flightService = new FlightService();
+        this.flightService = FlightService.getInstance();
     }
 
     @FXML

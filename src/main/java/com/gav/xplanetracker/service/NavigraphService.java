@@ -13,6 +13,8 @@ import java.io.IOException;
 
 public class NavigraphService {
 
+    private static NavigraphService INSTANCE;
+
     private final OkHttpClient client;
     private final XmlMapper xmlMapper;
 
@@ -20,6 +22,13 @@ public class NavigraphService {
         this.client = new OkHttpClient();
         this.xmlMapper = new XmlMapper();
         configureXmlMapper();
+    }
+
+    public static NavigraphService getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new NavigraphService();
+        }
+        return INSTANCE;
     }
 
     private void configureXmlMapper() {
