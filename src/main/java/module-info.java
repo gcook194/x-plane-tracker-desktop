@@ -5,6 +5,8 @@ module com.gav.xplanetracker {
     requires okhttp;
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.databind;
+    requires java.sql;
+    requires flyway.core;
 
 
     opens com.gav.xplanetracker to javafx.fxml;
@@ -13,4 +15,5 @@ module com.gav.xplanetracker {
     opens com.gav.xplanetracker.controller to javafx.fxml;
     exports com.gav.xplanetracker.scheduler;
     opens com.gav.xplanetracker.scheduler to javafx.fxml;
+    opens db.migration;
 }
