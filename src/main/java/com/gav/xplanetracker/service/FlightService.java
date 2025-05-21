@@ -1,6 +1,6 @@
 package com.gav.xplanetracker.service;
 
-import com.gav.xplanetracker.dao.FlightDAOJDBC;
+import com.gav.xplanetracker.dao.FlightDaoJDBC;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightStatus;
 import com.gav.xplanetracker.model.Flight;
@@ -13,10 +13,10 @@ public final class FlightService {
 
     private static FlightService INSTANCE;
 
-    private final FlightDAOJDBC flightDao;
+    private final FlightDaoJDBC flightDao;
 
     public FlightService() {
-        this.flightDao = FlightDAOJDBC.getInstance();
+        this.flightDao = FlightDaoJDBC.getInstance();
     }
 
     public static FlightService getInstance() {
@@ -34,6 +34,7 @@ public final class FlightService {
     public Flight startFlight(final NavigraphFlightPlan navigraphFlightPlan) {
         System.out.println("Starting Flight");
 
+        // TODO look at lombok, mapstruct or create a builder class
         final Flight flight = new Flight();
         flight.setStartedAt(Instant.now());
         flight.setFlightNumberIcao(navigraphFlightPlan.getIcaoAirline() + navigraphFlightPlan.getFlightNumber());
@@ -56,6 +57,8 @@ public final class FlightService {
 
     public Optional<Flight> getCurrentFlight() {
         final Flight flight = flightDao.getFlightByStatus(FlightStatus.IN_PROGRESS);
+        System.out.println("Current flight found so won't create a new one");
+
         return Optional.ofNullable(flight);
     }
 }

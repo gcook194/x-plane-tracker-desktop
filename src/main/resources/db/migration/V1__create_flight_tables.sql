@@ -8,7 +8,7 @@ CREATE TABLE flight (
     aircraft_reg TEXT,
     aircraft_type TEXT,
     arrival_airport_icao TEXT,
-    depasture_airport_icao TEXT,
+    departure_airport_icao TEXT,
     flight_number_icao TEXT,
     status TEXT CHECK (status IN ('NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'ERROR'))
 );

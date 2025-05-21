@@ -8,13 +8,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class FlightDAOJDBC {
+public class FlightDaoJDBC {
 
-    private static FlightDAOJDBC INSTANCE;
+    private static FlightDaoJDBC INSTANCE;
 
-    public static FlightDAOJDBC getInstance() {
+    public static FlightDaoJDBC getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new FlightDAOJDBC();
+            INSTANCE = new FlightDaoJDBC();
         }
         return INSTANCE;
     }
@@ -27,7 +27,7 @@ public class FlightDAOJDBC {
                 "    aircraft_reg,\n" +
                 "    aircraft_type,\n" +
                 "    arrival_airport_icao,\n" +
-                "    depasture_airport_icao,\n" +
+                "    departure_airport_icao,\n" +
                 "    flight_number_icao,\n" +
                 "    status\n" +
                 ") VALUES (\n" +
@@ -37,10 +37,11 @@ public class FlightDAOJDBC {
                 "    ?, -- aircraft_reg\n" +
                 "    ?, -- aircraft_type\n" +
                 "    ?, -- arrival_airport_icao\n" +
-                "    ?, -- depasture_airport_icao (typo in original, assuming \"departure\")\n" +
+                "    ?, -- departure_airport_icao (typo in original, assuming \"departure\")\n" +
                 "    ?, -- flight_number_icao\n" +
                 "    ?  -- status\n" +
                 ")";
+
         try (Connection connection = DatabaseConnection.connect()) {
             final PreparedStatement ps = connection.prepareStatement(SQL);
             ps.setString(1, flight.getCreatedAt().toString());
