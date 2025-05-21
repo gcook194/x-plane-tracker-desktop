@@ -1,6 +1,7 @@
 package com.gav.xplanetracker.dao;
 
 import com.gav.xplanetracker.database.DatabaseConnection;
+import com.gav.xplanetracker.enums.FlightStatus;
 import com.gav.xplanetracker.model.Flight;
 
 import java.sql.Connection;
@@ -61,5 +62,11 @@ public class FlightDAOJDBC {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Flight getFlightByStatus(FlightStatus flightStatus) {
+        final String SQL = "SELECT * FROM flight WHERE status = ?";
+
+        return null;
     }
 }

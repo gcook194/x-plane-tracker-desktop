@@ -61,7 +61,7 @@ public class FlightController {
             @Override
             protected Flight call() {
                 final NavigraphFlightPlan navigraphFlightPlan = navigraphService.getFlightPlan();
-                return flightService.startFlight(navigraphFlightPlan);
+                return flightService.getOrCreateCurrentFlight(navigraphFlightPlan);
             }
 
             @Override

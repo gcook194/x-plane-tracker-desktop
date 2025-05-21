@@ -26,6 +26,11 @@ public final class FlightService {
         return INSTANCE;
     }
 
+    public Flight getOrCreateCurrentFlight(final NavigraphFlightPlan navigraphFlightPlan) {
+        return this.getCurrentFlight()
+                .orElse(startFlight(navigraphFlightPlan));
+    }
+
     public Flight startFlight(final NavigraphFlightPlan navigraphFlightPlan) {
         System.out.println("Starting Flight");
 
@@ -50,6 +55,7 @@ public final class FlightService {
     }
 
     public Optional<Flight> getCurrentFlight() {
-        return Optional.of(new Flight());
+        final Flight flight = flightDao.getFlightByStatus(FlightStatus.IN_PROGRESS);
+        return Optional.ofNullable(flight);
     }
 }
