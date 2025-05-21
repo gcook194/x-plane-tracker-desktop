@@ -38,8 +38,8 @@ public final class FlightService {
         final Flight flight = new Flight();
         flight.setStartedAt(Instant.now());
         flight.setFlightNumberIcao(navigraphFlightPlan.getIcaoAirline() + navigraphFlightPlan.getFlightNumber());
-        flight.setDepartureAirportIcao(navigraphFlightPlan.getDepartureAirport());
-        flight.setArrivalAirportIcao(navigraphFlightPlan.getArrivalAirport());
+        flight.setDepartureAirportIcao(navigraphFlightPlan.getDeparture().getIcaoCode());
+        flight.setArrivalAirportIcao(navigraphFlightPlan.getArrival().getIcaoCode());
         flight.setAircraftTypeIcao(navigraphFlightPlan.getAircraftType());
         flight.setAircraftReg(navigraphFlightPlan.getAircraftRegistration());
         flight.setCreatedAt(Instant.now());

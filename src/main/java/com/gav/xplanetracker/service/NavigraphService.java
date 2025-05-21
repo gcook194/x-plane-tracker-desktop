@@ -49,20 +49,32 @@ public class NavigraphService {
 
     private void setOriginDetails(final JsonNode navigraphResponse, final NavigraphFlightPlan flightPlan) {
         final JsonNode originNode = navigraphResponse.path("origin");
-        final String departureAirport = originNode.path("icao_code").asText();
+        final String icaoCode = originNode.path("icao_code").asText();
+        final String name = originNode.path("name").textValue();
+        final double latitude = originNode.path("pos_lat").asDouble();
+        final double longitude = originNode.path("pos_long").asDouble();
 
-        System.out.println("Origin - departure airport - " + departureAirport);
+        System.out.println("Origin - departure airport - " + icaoCode);
 
-        flightPlan.setDepartureAirport(departureAirport);
+        flightPlan.getDeparture().setIcaoCode(icaoCode);
+        flightPlan.getDeparture().setName(name);
+        flightPlan.getDeparture().setLatitude(latitude);
+        flightPlan.getDeparture().setLongitude(longitude);
     }
 
     private void setDestinationDetails(final JsonNode navigraphResponse, final NavigraphFlightPlan flightPlan) {
         final JsonNode destinationNode = navigraphResponse.path("destination");
-        final String arrivalAirport = destinationNode.path("icao_code").asText();
+        final String icaoCode = destinationNode.path("icao_code").asText();
+        final String name = destinationNode.path("name").textValue();
+        final double latitude = destinationNode.path("pos_lat").asDouble();
+        final double longitude = destinationNode.path("pos_long").asDouble();
 
-        System.out.println("Destination - arrival airport - " + arrivalAirport);
+        System.out.println("Destination - arrival airport - " + icaoCode);
 
-        flightPlan.setArrivalAirport(arrivalAirport);
+        flightPlan.getArrival().setIcaoCode(icaoCode);
+        flightPlan.getArrival().setName(name);
+        flightPlan.getArrival().setLatitude(latitude);
+        flightPlan.getArrival().setLongitude(longitude);
     }
 
     private void setAircraftDetails(final JsonNode navigraphResponse, final NavigraphFlightPlan flightPlan) {

@@ -4,10 +4,15 @@ public class NavigraphFlightPlan {
 
     private String icaoAirline;
     private String flightNumber;
-    private String departureAirport;
-    private String arrivalAirport;
     private String aircraftType;
     private String aircraftRegistration;
+    private Airport departure;
+    private Airport arrival;
+
+    public NavigraphFlightPlan() {
+        this.departure = new Airport();
+        this.arrival = new Airport();
+    }
 
     public String getIcaoAirline() {
         return icaoAirline;
@@ -25,22 +30,6 @@ public class NavigraphFlightPlan {
         this.flightNumber = flightNumber;
     }
 
-    public String getDepartureAirport() {
-        return departureAirport;
-    }
-
-    public void setDepartureAirport(String departureAirport) {
-        this.departureAirport = departureAirport;
-    }
-
-    public String getArrivalAirport() {
-        return arrivalAirport;
-    }
-
-    public void setArrivalAirport(String arrivalAirport) {
-        this.arrivalAirport = arrivalAirport;
-    }
-
     public String getAircraftType() {
         return aircraftType;
     }
@@ -55,5 +44,21 @@ public class NavigraphFlightPlan {
 
     public void setAircraftRegistration(String aircraftRegistration) {
         this.aircraftRegistration = aircraftRegistration;
+    }
+
+    public Airport getDeparture() {
+        return departure;
+    }
+
+    public void setDeparture(Airport departure) {
+        this.departure = departure;
+    }
+
+    public Airport getArrival() {
+        return arrival;
+    }
+
+    public void setArrival(Airport arrival) {
+        this.arrival = arrival;
     }
 }

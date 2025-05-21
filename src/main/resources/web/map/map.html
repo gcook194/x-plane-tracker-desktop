@@ -22,10 +22,24 @@
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
 <script>
+    var markers = [];
     var map = L.map('map').setView([51.505, -0.09], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
+
+    // Function to add a marker from Java
+    function addMarkerToMap(lat, lng, label) {
+        const marker = L.marker([lat, lng]).addTo(map).bindPopup(label).openPopup();
+        markers.push(marker);
+    }
+
+    function fitToAllMarkers() {
+        if (markers.length > 0) {
+            var group = L.featureGroup(markers);
+            map.fitBounds(group.getBounds());
+        }
+    }
 </script>
 </body>
 </html>

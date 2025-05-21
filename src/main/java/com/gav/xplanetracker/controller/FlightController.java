@@ -5,6 +5,7 @@ import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.NavigraphService;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,6 +20,8 @@ public class FlightController {
 
     private final FlightService flightService;
     private final NavigraphService navigraphService;
+
+    private NavigraphFlightPlan navigraphFlightPlan;
 
     public FlightController() {
         this.flightService = FlightService.getInstance();
@@ -66,11 +69,38 @@ public class FlightController {
 
     @FXML
     public void initialize() {
+
+        // load the flight plan from Navigraph
+        navigraphFlightPlan = navigraphService.getFlightPlan();
+
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
+        mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
         final WebView webView = new WebView();
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
+
+        // TODO make this a method
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                addMarker(
+                        webEngine,
+                        navigraphFlightPlan.getDeparture().getLatitude(),
+                        navigraphFlightPlan.getDeparture().getLongitude(),
+                        navigraphFlightPlan.getDeparture().getName()
+                );
+
+                addMarker(
+                        webEngine,
+                        navigraphFlightPlan.getArrival().getLatitude(),
+                        navigraphFlightPlan.getArrival().getLongitude(),
+                        navigraphFlightPlan.getArrival().getName()
+                );
+
+                webEngine.executeScript("fitToAllMarkers();");
+            }
+        });
+
 
         webView.prefWidthProperty().bind(mapPanel.widthProperty());
         webView.prefHeightProperty().bind(mapPanel.heightProperty());
@@ -87,7 +117,6 @@ public class FlightController {
         final Task<Flight> loadFlightDataTask = new Task<>() {
             @Override
             protected Flight call() {
-                final NavigraphFlightPlan navigraphFlightPlan = navigraphService.getFlightPlan();
                 return flightService.getOrCreateCurrentFlight(navigraphFlightPlan);
             }
 
@@ -133,5 +162,10 @@ public class FlightController {
         flightDetailsBox.setManaged(false);
         startFlight.setVisible(true);
         startFlight.setManaged(true);
+    }
+
+    private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
+        String script = String.format("addMarkerToMap(%f, %f, '%s');", latitude, longitude, label);
+        webEngine.executeScript(script);
     }
 }
