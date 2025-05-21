@@ -10,7 +10,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 public class FlightController {
 
@@ -51,6 +54,30 @@ public class FlightController {
 
     @FXML
     private Button stopFlight;
+
+    @FXML
+    private VBox mapPanel;
+
+    @FXML
+    private VBox leftPanel;
+
+    @FXML
+    private HBox rootBox;
+
+    @FXML
+    public void initialize() {
+        leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
+
+        final WebView webView = new WebView();
+        final WebEngine webEngine = webView.getEngine();
+        webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
+
+        webView.prefWidthProperty().bind(mapPanel.widthProperty());
+        webView.prefHeightProperty().bind(mapPanel.heightProperty());
+
+        mapPanel.getChildren().clear();
+        mapPanel.getChildren().add(webView);
+    }
 
     @FXML
     protected void onStartFlightClick() {

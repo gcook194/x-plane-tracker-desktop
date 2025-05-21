@@ -27,8 +27,8 @@ public final class FlightService {
     }
 
     public Flight getOrCreateCurrentFlight(final NavigraphFlightPlan navigraphFlightPlan) {
-        return this.getCurrentFlight()
-                .orElse(startFlight(navigraphFlightPlan));
+        return getCurrentFlight()
+                .orElseGet(() -> startFlight(navigraphFlightPlan));
     }
 
     public Flight startFlight(final NavigraphFlightPlan navigraphFlightPlan) {
@@ -47,18 +47,14 @@ public final class FlightService {
         flight.setStatus(FlightStatus.IN_PROGRESS);
         flight.setUserId(UUID.randomUUID()); //TODO eventually needs to be a real value
 
-        // save to db
         flightDao.create(flight);
 
-        // send message to aws
+        // TODO send message to aws
 
         return flight;
     }
 
     public Optional<Flight> getCurrentFlight() {
-        final Flight flight = flightDao.getFlightByStatus(FlightStatus.IN_PROGRESS);
-        System.out.println("Current flight found so won't create a new one");
-
-        return Optional.ofNullable(flight);
+        return Optional.ofNullable(flightDao.getFlightByStatus(FlightStatus.IN_PROGRESS));
     }
 }

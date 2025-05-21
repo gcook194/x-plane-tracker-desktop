@@ -6,7 +6,12 @@ import com.gav.xplanetracker.model.Flight;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class FlightDaoJDBC {
 
@@ -37,7 +42,7 @@ public class FlightDaoJDBC {
                 "    ?, -- aircraft_reg\n" +
                 "    ?, -- aircraft_type\n" +
                 "    ?, -- arrival_airport_icao\n" +
-                "    ?, -- departure_airport_icao (typo in original, assuming \"departure\")\n" +
+                "    ?, -- departure_airport_icao\n" +
                 "    ?, -- flight_number_icao\n" +
                 "    ?  -- status\n" +
                 ")";
@@ -46,7 +51,7 @@ public class FlightDaoJDBC {
             final PreparedStatement ps = connection.prepareStatement(SQL);
             ps.setString(1, flight.getCreatedAt().toString());
             ps.setString(2, flight.getStartedAt().toString());
-            ps.setString(2, flight.getUserId().toString());
+            ps.setString(3, flight.getUserId().toString());
             ps.setString(4, flight.getAircraftReg());
             ps.setString(5, flight.getAircraftTypeIcao());
             ps.setString(6, flight.getArrivalAirportIcao());
@@ -68,6 +73,47 @@ public class FlightDaoJDBC {
     public Flight getFlightByStatus(FlightStatus flightStatus) {
         final String SQL = "SELECT * FROM flight WHERE status = ?";
 
-        return null;
+        try (Connection connection = DatabaseConnection.connect()) {
+            final List<Flight> flights = new ArrayList<>();
+
+            final PreparedStatement ps = connection.prepareStatement(SQL);
+            ps.setString(1, flightStatus.name());
+
+            final ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                final Flight flight = new Flight();
+                flight.setId(rs.getInt("id"));
+                flight.setUserId(UUID.fromString(rs.getString("user_id")));
+
+                //TODO probably need null checks on these date operations
+                flight.setCreatedAt(Instant.parse(rs.getString("created_at")));
+                flight.setStartedAt(Instant.parse(rs.getString("started_at")));
+//                flight.setCompletedAt(Instant.parse(rs.getString("completed_at")));
+//                flight.setCancelledAt(Instant.parse(rs.getString("cancelled_at")));
+
+                flight.setFlightNumberIcao(rs.getString("flight_number_icao"));
+                flight.setAircraftTypeIcao(rs.getString("aircraft_type"));
+                flight.setAircraftReg(rs.getString("aircraft_reg"));
+                flight.setDepartureAirportIcao(rs.getString("departure_airport_icao"));
+                flight.setArrivalAirportIcao(rs.getString("arrival_airport_icao"));
+                flight.setStatus(FlightStatus.IN_PROGRESS); // TODO update enum to get name by string
+
+                flights.add(flight);
+            }
+
+            if (flights.isEmpty()) {
+                return null;
+            }
+
+            if (flights.size() > 1) {
+                System.out.println("More than 1 flight returned - look into query");
+            }
+
+            return flights.getFirst();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }
