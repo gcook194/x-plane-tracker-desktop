@@ -23,15 +23,24 @@
 <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
 <script>
     var markers = [];
-    var map = L.map('map').setView([51.505, -0.09], 13);
+    var map = L.map('map').fitWorld();
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
     // Function to add a marker from Java
     function addMarkerToMap(lat, lng, label) {
-        const marker = L.marker([lat, lng]).addTo(map).bindPopup(label).openPopup();
+        const marker = L.marker([lat, lng]).addTo(map).bindPopup(label);
         markers.push(marker);
+    }
+
+    function drawBasicRouteLine() {
+        if (markers.length > 1) {
+            const marker1 = markers[0].getLatLng();
+            const marker2 = markers[1].getLatLng();
+
+            L.polyline([marker1, marker2]).addTo(map);
+        }
     }
 
     function fitToAllMarkers() {

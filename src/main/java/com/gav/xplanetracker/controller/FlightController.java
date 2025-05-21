@@ -21,11 +21,16 @@ public class FlightController {
     private final FlightService flightService;
     private final NavigraphService navigraphService;
 
+    private final WebView webView;
+    private final WebEngine webEngine;
+
     private NavigraphFlightPlan navigraphFlightPlan;
 
     public FlightController() {
         this.flightService = FlightService.getInstance();
         this.navigraphService = NavigraphService.getInstance();
+        this.webView = new WebView();
+        this.webEngine = webView.getEngine();
     }
 
     @FXML
@@ -76,8 +81,6 @@ public class FlightController {
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
-        final WebView webView = new WebView();
-        final WebEngine webEngine = webView.getEngine();
         webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
 
         // TODO make this a method
@@ -97,10 +100,10 @@ public class FlightController {
                         navigraphFlightPlan.getArrival().getName()
                 );
 
+                webEngine.executeScript("drawBasicRouteLine();");
                 webEngine.executeScript("fitToAllMarkers();");
             }
         });
-
 
         webView.prefWidthProperty().bind(mapPanel.widthProperty());
         webView.prefHeightProperty().bind(mapPanel.heightProperty());
@@ -165,6 +168,11 @@ public class FlightController {
     }
 
     private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
+        // fix markets not repeating
+        if (longitude < 0) {
+            longitude += 360;
+        }
+
         String script = String.format("addMarkerToMap(%f, %f, '%s');", latitude, longitude, label);
         webEngine.executeScript(script);
     }

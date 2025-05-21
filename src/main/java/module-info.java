@@ -8,6 +8,7 @@ module com.gav.xplanetracker {
     requires java.sql;
     requires flyway.core;
     requires javafx.web;
+    requires jdk.jsobject;
 
 
     opens com.gav.xplanetracker to javafx.fxml;
