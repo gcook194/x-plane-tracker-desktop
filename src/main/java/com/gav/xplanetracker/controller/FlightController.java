@@ -1,7 +1,9 @@
 package com.gav.xplanetracker.controller;
 
+import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.service.FlightService;
+import com.gav.xplanetracker.service.NavigraphService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,9 +15,11 @@ import javafx.scene.layout.VBox;
 public class FlightController {
 
     private final FlightService flightService;
+    private final NavigraphService navigraphService;
 
     public FlightController() {
         this.flightService = FlightService.getInstance();
+        this.navigraphService = NavigraphService.getInstance();
     }
 
     @FXML
@@ -56,7 +60,8 @@ public class FlightController {
         final Task<Flight> loadFlightDataTask = new Task<>() {
             @Override
             protected Flight call() {
-                return flightService.startFlight();
+                final NavigraphFlightPlan navigraphFlightPlan = navigraphService.getFlightPlan();
+                return flightService.startFlight(navigraphFlightPlan);
             }
 
             @Override

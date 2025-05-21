@@ -20,5 +20,6 @@ CREATE TABLE flight_event (
     pressure_altitude REAL,
     created_at TEXT,
     flight_id INTEGER,
-    id INTEGER PRIMARY KEY AUTOINCREMENT
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    FOREIGN KEY (flight_id) REFERENCES flight(id)
 );
