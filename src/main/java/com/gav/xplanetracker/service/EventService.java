@@ -99,7 +99,6 @@ public class EventService {
                     .execute()
                     .body();
             final ObjectMapper mapper = new ObjectMapper();
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
             body.close();
 
@@ -129,7 +128,6 @@ public class EventService {
                     .execute()
                     .body();
             final ObjectMapper mapper = new ObjectMapper();
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
             body.close();
 
@@ -159,7 +157,6 @@ public class EventService {
                     .execute()
                     .body();
             final ObjectMapper mapper = new ObjectMapper();
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
             body.close();
 
@@ -189,7 +186,6 @@ public class EventService {
                     .execute()
                     .body();
             final ObjectMapper mapper = new ObjectMapper();
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
             body.close();
 
