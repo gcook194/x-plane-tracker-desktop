@@ -69,7 +69,10 @@ public class EventService {
                 .url(datarefUri)
                 .build();
 
-        try (ResponseBody body = client.newCall(request).execute().body()) {
+        try {
+            final ResponseBody body = client.newCall(request)
+                    .execute()
+                    .body();
             final ObjectMapper mapper = new ObjectMapper();
             final XplaneDataRefListDTO dto = mapper.readValue(body.string(), XplaneDataRefListDTO.class);
             body.close();
@@ -91,11 +94,10 @@ public class EventService {
                 .url(xPlaneDataRefReqUri(densityAltDataRefId))
                 .build();
 
-        try (
-                ResponseBody body = client.newCall(request)
-                .execute()
-                .body()
-        ) {
+        try {
+            final ResponseBody body = client.newCall(request)
+                    .execute()
+                    .body();
             final ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
@@ -122,11 +124,10 @@ public class EventService {
                 .url(xPlaneDataRefReqUri(groundSpeedDataRefId))
                 .build();
 
-        try (
-                ResponseBody body = client.newCall(request)
-                        .execute()
-                        .body()
-        ) {
+        try {
+            final ResponseBody body = client.newCall(request)
+                    .execute()
+                    .body();
             final ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
@@ -153,11 +154,10 @@ public class EventService {
                 .url(xPlaneDataRefReqUri(latitudeDataRefId))
                 .build();
 
-        try (
-                ResponseBody body = client.newCall(request)
-                        .execute()
-                        .body()
-        ) {
+        try {
+            final ResponseBody body = client.newCall(request)
+                    .execute()
+                    .body();
             final ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
@@ -184,11 +184,10 @@ public class EventService {
                 .url(xPlaneDataRefReqUri(longitudeDataRefId))
                 .build();
 
-        try (
-                ResponseBody body = client.newCall(request)
-                        .execute()
-                        .body()
-        ) {
+        try {
+            final ResponseBody body = client.newCall(request)
+                    .execute()
+                    .body();
             final ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);

@@ -20,16 +20,17 @@ public class FlightEventDaoJDBC {
     }
 
     public void create(final FlightEvent event) {
-        final String SQL = "INSERT INTO flight_event (created_at, pressure_altitude, latitude, longitude, ground_speed) \n" +
-                "VALUES (?, ?, ?, ?, ?)";
+        final String SQL = "INSERT INTO flight_event (flight_id, created_at, pressure_altitude, latitude, longitude, ground_speed) \n" +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.connect()) {
             final PreparedStatement ps = connection.prepareStatement(SQL);
-            ps.setString(1, event.getCreatedAt().toString());
-            ps.setDouble(2, event.getPressureAltitude());
-            ps.setDouble(3, event.getLatitude());
-            ps.setDouble(4, event.getLongitude());
-            ps.setDouble(5, event.getGroundSpeed());
+            ps.setLong(1, event.getFlightId());
+            ps.setString(2, event.getCreatedAt().toString());
+            ps.setDouble(3, event.getPressureAltitude());
+            ps.setDouble(4, event.getLatitude());
+            ps.setDouble(5, event.getLongitude());
+            ps.setDouble(6, event.getGroundSpeed());
 
             final int rowsInserted = ps.executeUpdate();
 
