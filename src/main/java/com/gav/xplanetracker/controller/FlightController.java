@@ -4,6 +4,7 @@ import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.NavigraphService;
+import com.gav.xplanetracker.service.XPlaneService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
@@ -21,6 +22,7 @@ public class FlightController {
 
     private final FlightService flightService;
     private final NavigraphService navigraphService;
+    private final XPlaneService xPlaneService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
@@ -31,6 +33,7 @@ public class FlightController {
         this.navigraphService = NavigraphService.getInstance();
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
+        this.xPlaneService = XPlaneService.getInstance();
     }
 
     @FXML
@@ -73,14 +76,25 @@ public class FlightController {
     private HBox rootBox;
 
     @FXML
-    public void initialize() {
+    private Label errorMessage;
 
-        // load the flight plan from Navigraph
+    @FXML
+    private HBox errorBanner;
+
+    @FXML
+    private HBox successBanner;
+
+    @FXML
+    private Label successMessage;
+
+    @FXML
+    public void initialize() {
+        handleSimulatorState();
+
         navigraphFlightPlan = navigraphService.getFlightPlan();
 
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
-
         loadMap(false);
     }
 
@@ -194,5 +208,20 @@ public class FlightController {
 
         mapPanel.getChildren().clear();
         mapPanel.getChildren().add(webView);
+    }
+
+    //TODO this could probably be done as a single HBox and label but I am too stupid
+    public void handleSimulatorState() {
+        final boolean isSimulatorRunning = xPlaneService.isSimulatorRunning();
+
+        if (!isSimulatorRunning) {
+            errorMessage.setText("X-Plane is not connected!");
+            errorBanner.setManaged(true);
+            errorBanner.setVisible(true);
+        } else {
+            successMessage.setText("X-Plane is connected!");
+            successBanner.setManaged(true);
+            successBanner.setVisible(true);
+        }
     }
 }

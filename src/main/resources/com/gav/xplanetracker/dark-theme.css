@@ -73,4 +73,39 @@
 .label-value {
     -fx-text-fill: #bbbbbb;
 }
+
+.error-banner {
+    -fx-background-color: #3b0f0f;
+    -fx-padding: 10;
+    -fx-border-color: #ff4d4d;
+    -fx-border-width: 1 0 1 0;
+    -fx-text-fill: #ffcccc;
+}
+.error-banner Label {
+    -fx-text-fill: #ffb3b3;
+    -fx-font-weight: bold;
+}
+.error-banner Button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff9999;
+}
+
+.success-banner {
+    -fx-background-color: #0f3b1e;
+    -fx-padding: 10;
+    -fx-border-color: #4dff88;
+    -fx-border-width: 1 0 1 0;
+    -fx-text-fill: #ccffdd;
+}
+
+.success-banner Label {
+    -fx-text-fill: #b3ffc9;
+    -fx-font-weight: bold;
+}
+
+.success-banner Button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #99ffbb;
+    -fx-cursor: hand;
+}
 ``

@@ -4,6 +4,7 @@ package com.gav.xplanetracker.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.gav.xplanetracker.dao.SettingsDaoJDBC;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.dto.navigraph.Waypoint;
 import com.squareup.okhttp.OkHttpClient;
@@ -17,12 +18,15 @@ import java.util.List;
 
 public class NavigraphService {
 
+    public static final String SIMBRIEF_URI = "https://www.simbrief.com/api/xml.fetcher.php";
     private static NavigraphService INSTANCE;
 
+    private final SettingsDaoJDBC settingsDao;
     private final OkHttpClient client;
     private final XmlMapper xmlMapper;
 
     public NavigraphService() {
+        this.settingsDao = SettingsDaoJDBC.getInstance();
         this.client = new OkHttpClient();
         this.xmlMapper = new XmlMapper();
         configureXmlMapper();
@@ -123,18 +127,9 @@ public class NavigraphService {
 
     public NavigraphFlightPlan getFlightPlan() {
         System.out.println("Started loading Navigraph flight plan");
-
-        //TODO externalise this
-//        final Request request = new Request.Builder()
-//                .url("https://www.simbrief.com/api/xml.fetcher.php?username=Gavin194")
-//                .build();
-
         try {
-//            final Response response = client.newCall(request).execute();
-//            final JsonNode root = xmlMapper.readTree(response.body().string());
-
-            InputStream inputStream = NavigraphService.class.getClassLoader().getResourceAsStream("test-data/simbrief.xml");
-            final JsonNode root = xmlMapper.readTree(inputStream);
+            final boolean useNavigraphApi = settingsDao.useNavigraphConnection();
+            final JsonNode root = getRootNode(useNavigraphApi);
             final NavigraphFlightPlan flightPlan = new NavigraphFlightPlan();
 
             setGeneralDetails(root, flightPlan);
@@ -148,6 +143,23 @@ public class NavigraphService {
             return flightPlan;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private JsonNode getRootNode(final boolean useNavigraphApi) throws IOException {
+        if (useNavigraphApi) {
+            final String simbriefUser = settingsDao.getSimbriefUsername(); //Gavin194
+            final Request request = new Request.Builder()
+                    .url(SIMBRIEF_URI + "?username=" + simbriefUser)
+                    .build();
+            final Response response = client.newCall(request).execute();
+
+            return xmlMapper.readTree(response.body().string());
+        } else {
+            try (InputStream inputStream =
+                         NavigraphService.class.getClassLoader().getResourceAsStream("test-data/simbrief.xml")) {
+                return xmlMapper.readTree(inputStream);
+            }
         }
     }
 }

@@ -1,8 +1,13 @@
 package com.gav.xplanetracker.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.gav.xplanetracker.dto.xplane.XpDataRefListDTO;
 import com.gav.xplanetracker.model.Flight;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.ResponseBody;
+
+import java.io.IOException;
 
 public class EventService {
 
@@ -16,6 +21,11 @@ public class EventService {
 
     private static EventService INSTANCE;
 
+    private final OkHttpClient client;
+
+    public EventService() {
+        client = new OkHttpClient();
+    }
 
     public static EventService getInstance() {
         if (INSTANCE == null) {
@@ -26,6 +36,28 @@ public class EventService {
 
     public void create(final Flight flight) {
         System.out.println("Creating flight event for flight " + flight.getId());
+
+        // The IDs we need to query on are generated every time the simulator starts
+        final XpDataRefListDTO dataRefs = getDataRefs();
+    }
+
+    public XpDataRefListDTO getDataRefs() {
+        final String datarefUri = XPLANE_API_ADDRESS +
+                "?filter[name]=" + DENSITY_ALT_DATAREF_NAME +
+                "&filter[name]=" + GROUND_SPEED_DATAREF_NAME +
+                "&filter[name]=" + LATITUDE_DATAREF_NAME +
+                "&filter[name]=" + LONGITUDE_DATAREF_NAME;
+
+        final Request request = new Request.Builder()
+                .url(datarefUri)
+                .build();
+
+        try (ResponseBody body = client.newCall(request).execute().body()) {
+            final ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(body.string(), XpDataRefListDTO.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    public void create(final Flight flight) {
