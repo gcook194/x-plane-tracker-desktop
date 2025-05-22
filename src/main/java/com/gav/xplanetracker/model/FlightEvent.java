@@ -1,12 +1,12 @@
 package com.gav.xplanetracker.model;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 public class FlightEvent {
 
     private long id;
-    private ZonedDateTime createdAt;
+    private Instant createdAt;
     private double pressureAltitude;
     private double latitude;
     private double longitude;
@@ -22,11 +22,11 @@ public class FlightEvent {
         this.id = id;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
