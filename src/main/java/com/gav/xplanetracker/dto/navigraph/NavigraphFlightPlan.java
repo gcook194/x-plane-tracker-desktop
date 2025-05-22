@@ -1,5 +1,8 @@
 package com.gav.xplanetracker.dto.navigraph;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NavigraphFlightPlan {
 
     private String icaoAirline;
@@ -8,10 +11,12 @@ public class NavigraphFlightPlan {
     private String aircraftRegistration;
     private Airport departure;
     private Airport arrival;
+    private List<Waypoint> waypoints;
 
     public NavigraphFlightPlan() {
         this.departure = new Airport();
         this.arrival = new Airport();
+        this.waypoints = new ArrayList<>();
     }
 
     public String getIcaoAirline() {
@@ -60,5 +65,17 @@ public class NavigraphFlightPlan {
 
     public void setArrival(Airport arrival) {
         this.arrival = arrival;
+    }
+
+    public List<Waypoint> getWaypoints() {
+        return waypoints;
+    }
+
+    public void setWaypoints(List<Waypoint> waypoints) {
+        this.waypoints = waypoints;
+    }
+
+    public void addWaypoints(List<Waypoint> waypoints) {
+        this.waypoints.addAll(waypoints);
     }
 }

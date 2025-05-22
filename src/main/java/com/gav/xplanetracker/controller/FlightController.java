@@ -16,15 +16,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+
 public class FlightController {
 
     private final FlightService flightService;
     private final NavigraphService navigraphService;
 
-    private final WebView webView;
-    private final WebEngine webEngine;
-
     private NavigraphFlightPlan navigraphFlightPlan;
+    final WebView webView;
+    final WebEngine webEngine;
 
     public FlightController() {
         this.flightService = FlightService.getInstance();
@@ -81,35 +81,7 @@ public class FlightController {
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
-        webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
-
-        // TODO make this a method
-        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                addMarker(
-                        webEngine,
-                        navigraphFlightPlan.getDeparture().getLatitude(),
-                        navigraphFlightPlan.getDeparture().getLongitude(),
-                        navigraphFlightPlan.getDeparture().getName()
-                );
-
-                addMarker(
-                        webEngine,
-                        navigraphFlightPlan.getArrival().getLatitude(),
-                        navigraphFlightPlan.getArrival().getLongitude(),
-                        navigraphFlightPlan.getArrival().getName()
-                );
-
-                webEngine.executeScript("drawBasicRouteLine();");
-                webEngine.executeScript("fitToAllMarkers();");
-            }
-        });
-
-        webView.prefWidthProperty().bind(mapPanel.widthProperty());
-        webView.prefHeightProperty().bind(mapPanel.heightProperty());
-
-        mapPanel.getChildren().clear();
-        mapPanel.getChildren().add(webView);
+        loadMap(false);
     }
 
     @FXML
@@ -144,6 +116,8 @@ public class FlightController {
                 arrivalAirport.setText(flight.getArrivalAirportIcao());
                 aircraftType.setText(flight.getAircraftTypeIcao());
                 aircraftReg.setText(flight.getAircraftReg());
+
+                loadMap(true);
             }
 
             @Override
@@ -165,15 +139,60 @@ public class FlightController {
         flightDetailsBox.setManaged(false);
         startFlight.setVisible(true);
         startFlight.setManaged(true);
+        loadMap(false);
     }
 
     private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
-        // fix markets not repeating
+        // TODO test with a west to east flight plan
+        // draws lines east to west if necessary
         if (longitude < 0) {
             longitude += 360;
         }
 
         String script = String.format("addMarkerToMap(%f, %f, '%s');", latitude, longitude, label);
         webEngine.executeScript(script);
+    }
+
+    private void loadMap(boolean drawFlightDetails) {
+        webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
+
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                webEngine.executeScript("loadMap();");
+                if (drawFlightDetails) {
+                    addMarker(
+                            webEngine,
+                            navigraphFlightPlan.getDeparture().getLatitude(),
+                            navigraphFlightPlan.getDeparture().getLongitude(),
+                            navigraphFlightPlan.getDeparture().getName()
+                    );
+
+                    navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
+                        addMarker(
+                                webEngine,
+                                waypoint.getLatitude(),
+                                waypoint.getLongitude(),
+                                waypoint.getName()
+                        );
+                    });
+
+                    addMarker(
+                            webEngine,
+                            navigraphFlightPlan.getArrival().getLatitude(),
+                            navigraphFlightPlan.getArrival().getLongitude(),
+                            navigraphFlightPlan.getArrival().getName()
+                    );
+
+                    webEngine.executeScript("drawBasicRouteLine();");
+                    webEngine.executeScript("fitToAllMarkers();");
+                }
+            }
+        });
+
+        webView.prefWidthProperty().bind(mapPanel.widthProperty());
+        webView.prefHeightProperty().bind(mapPanel.heightProperty());
+
+        mapPanel.getChildren().clear();
+        mapPanel.getChildren().add(webView);
     }
 }

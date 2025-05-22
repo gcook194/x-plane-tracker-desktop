@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
+import com.gav.xplanetracker.dto.navigraph.Waypoint;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NavigraphService {
 
@@ -89,23 +93,55 @@ public class NavigraphService {
         flightPlan.setAircraftRegistration(aircraftReg);
     }
 
+    private void setWaypointDetails(final JsonNode navigraphResponse, final NavigraphFlightPlan flightPlan) {
+        final JsonNode waypointsNode = navigraphResponse.path("navlog");
+        final List<Waypoint> waypoints = new ArrayList<>();
+
+        System.out.println("Waypoints");
+
+        waypointsNode.path("fix").elements().forEachRemaining(fix -> {
+            final String name = fix.path("name").asText();
+            final String stageOfFlight = fix.path("stage").asText();
+            final String viaAirway = fix.path("via_airway").asText();
+            final double latitude = fix.path("pos_lat").asDouble();
+            final double longitude = fix.path("pos_long").asDouble();
+
+            System.out.printf("\t %s, lat: %f, long: %f%n", name, latitude, longitude);
+
+            final Waypoint waypoint = new Waypoint();
+            waypoint.setName(name);
+            waypoint.setStageOfFlight(stageOfFlight);
+            waypoint.setViaAirway(viaAirway);
+            waypoint.setLatitude(latitude);
+            waypoint.setLongitude(longitude);
+
+            waypoints.add(waypoint);
+        });
+
+        flightPlan.addWaypoints(waypoints);
+    }
+
     public NavigraphFlightPlan getFlightPlan() {
         System.out.println("Started loading Navigraph flight plan");
 
         //TODO externalise this
-        final Request request = new Request.Builder()
-                .url("https://www.simbrief.com/api/xml.fetcher.php?username=Gavin194")
-                .build();
+//        final Request request = new Request.Builder()
+//                .url("https://www.simbrief.com/api/xml.fetcher.php?username=Gavin194")
+//                .build();
 
         try {
-            final Response response = client.newCall(request).execute();
-            final JsonNode root = xmlMapper.readTree(response.body().string());
+//            final Response response = client.newCall(request).execute();
+//            final JsonNode root = xmlMapper.readTree(response.body().string());
+
+            InputStream inputStream = NavigraphService.class.getClassLoader().getResourceAsStream("test-data/simbrief.xml");
+            final JsonNode root = xmlMapper.readTree(inputStream);
             final NavigraphFlightPlan flightPlan = new NavigraphFlightPlan();
 
             setGeneralDetails(root, flightPlan);
             setOriginDetails(root, flightPlan);
             setDestinationDetails(root, flightPlan);
             setAircraftDetails(root, flightPlan);
+            setWaypointDetails(root, flightPlan);
 
             System.out.println("Finished loading Navigraph flight plan");
 

@@ -16,6 +16,18 @@
           height: 100%;
           width: 100%;
         }
+
+        .white-dot-icon {
+          background-color: white;
+          border-radius: 50%;
+          width: 8px;
+          height: 8px;
+          border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        #map {
+            background-color: #252525;
+        }
     </style>
 </head>
 <body>
@@ -23,23 +35,48 @@
 <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
 <script>
     var markers = [];
-    var map = L.map('map').fitWorld();
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    var map;
 
-    // Function to add a marker from Java
+    var whiteDotIcon = L.icon({
+      iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8">
+          <circle cx="4" cy="4" r="3" fill="white" />
+        </svg>
+      `),
+      iconSize: [9, 9],      // actual size of the icon
+      iconAnchor: [4, 4],    // center the dot on the lat/lng
+      popupAnchor: [0, -4]   // adjust popup position
+    });
+
+    function loadMap() {
+        if (map != null) {
+            markers = [];
+            map.off();
+            map.remove();
+        }
+
+        map = L.map('map').fitWorld();
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+          maxZoom: 19
+        }).addTo(map);
+    }
+
     function addMarkerToMap(lat, lng, label) {
-        const marker = L.marker([lat, lng]).addTo(map).bindPopup(label);
+        const marker = L.marker([lat, lng], { icon: whiteDotIcon }).addTo(map).bindPopup(label);
         markers.push(marker);
     }
 
     function drawBasicRouteLine() {
         if (markers.length > 1) {
-            const marker1 = markers[0].getLatLng();
-            const marker2 = markers[1].getLatLng();
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i+1] != null) {
+                    const startLine = markers[i].getLatLng();
+                    const endLine = markers[i+1].getLatLng();
 
-            L.polyline([marker1, marker2]).addTo(map);
+                    L.polyline([startLine, endLine]).addTo(map);
+                }
+            }
         }
     }
 
