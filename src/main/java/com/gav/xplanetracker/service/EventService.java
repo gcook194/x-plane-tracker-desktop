@@ -1,10 +1,10 @@
 package com.gav.xplanetracker.service;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dao.FlightEventDaoJDBC;
-import com.gav.xplanetracker.dto.xplane.XPDataRefDTO;
-import com.gav.xplanetracker.dto.xplane.XpDataRefListDTO;
-import com.gav.xplanetracker.dto.xplane.XplaneApiResponse;
+import com.gav.xplanetracker.dto.xplane.*;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.squareup.okhttp.OkHttpClient;
@@ -45,7 +45,7 @@ public class EventService {
         System.out.println("Creating flight event for flight " + flight.getId());
 
         // The IDs we need to query on are generated every time the simulator starts
-        final XpDataRefListDTO dataRefs = getDataRefs();
+        final XplaneDataRefListDTO dataRefs = getDataRefs();
 
         final FlightEvent event = new FlightEvent();
         event.setPressureAltitude(getPressureAltitude(dataRefs));
@@ -53,11 +53,12 @@ public class EventService {
         event.setLatitude(getLatitude(dataRefs));
         event.setLongitude(getLongitude(dataRefs));
         event.setCreatedAt(Instant.now());
+        event.setFlightId(flight.getId());
 
         flightEventDao.create(event);
     }
 
-    public XpDataRefListDTO getDataRefs() {
+    public XplaneDataRefListDTO getDataRefs() {
         final String datarefUri = XPLANE_API_ADDRESS +
                 "?filter[name]=" + DENSITY_ALT_DATAREF_NAME +
                 "&filter[name]=" + GROUND_SPEED_DATAREF_NAME +
@@ -70,17 +71,20 @@ public class EventService {
 
         try (ResponseBody body = client.newCall(request).execute().body()) {
             final ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(body.string(), XpDataRefListDTO.class);
+            final XplaneDataRefListDTO dto = mapper.readValue(body.string(), XplaneDataRefListDTO.class);
+            body.close();
+
+            return dto;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public double getPressureAltitude(XpDataRefListDTO dataRefs) {
-        final String densityAltDataRefId = dataRefs.data().stream()
-                .filter(dataRef -> dataRef.name().equals(DENSITY_ALT_DATAREF_NAME))
+    public double getPressureAltitude(XplaneDataRefListDTO dataRefs) {
+        final String densityAltDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(DENSITY_ALT_DATAREF_NAME))
                 .findAny()
-                .map(XPDataRefDTO::id)
+                .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
         final Request request = new Request.Builder()
@@ -93,7 +97,9 @@ public class EventService {
                 .body()
         ) {
             final ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
+            body.close();
 
             if (response != null) {
                 return Double.parseDouble(response.data());
@@ -105,11 +111,11 @@ public class EventService {
         }
     }
 
-    public double getGroundSpeed(XpDataRefListDTO dataRefs) {
-        final String groundSpeedDataRefId = dataRefs.data().stream()
-                .filter(dataRef -> dataRef.name().equals(GROUND_SPEED_DATAREF_NAME))
+    public double getGroundSpeed(XplaneDataRefListDTO dataRefs) {
+        final String groundSpeedDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(GROUND_SPEED_DATAREF_NAME))
                 .findAny()
-                .map(XPDataRefDTO::id)
+                .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
         final Request request = new Request.Builder()
@@ -122,7 +128,9 @@ public class EventService {
                         .body()
         ) {
             final ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
+            body.close();
 
             if (response != null) {
                 return Double.parseDouble(response.data());
@@ -134,11 +142,11 @@ public class EventService {
         }
     }
 
-    public double getLatitude(XpDataRefListDTO dataRefs) {
-        final String latitudeDataRefId = dataRefs.data().stream()
-                .filter(dataRef -> dataRef.name().equals(LATITUDE_DATAREF_NAME))
+    public double getLatitude(XplaneDataRefListDTO dataRefs) {
+        final String latitudeDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(LATITUDE_DATAREF_NAME))
                 .findAny()
-                .map(XPDataRefDTO::id)
+                .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
         final Request request = new Request.Builder()
@@ -151,7 +159,9 @@ public class EventService {
                         .body()
         ) {
             final ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
+            body.close();
 
             if (response != null) {
                 return Double.parseDouble(response.data());
@@ -163,11 +173,11 @@ public class EventService {
         }
     }
 
-    public double getLongitude(XpDataRefListDTO dataRefs) {
-        final String longitudeDataRefId = dataRefs.data().stream()
-                .filter(dataRef -> dataRef.name().equals(LONGITUDE_DATAREF_NAME))
+    public double getLongitude(XplaneDataRefListDTO dataRefs) {
+        final String longitudeDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(LONGITUDE_DATAREF_NAME))
                 .findAny()
-                .map(XPDataRefDTO::id)
+                .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
         final Request request = new Request.Builder()
@@ -180,7 +190,9 @@ public class EventService {
                         .body()
         ) {
             final ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
+            body.close();
 
             if (response != null) {
                 return Double.parseDouble(response.data());

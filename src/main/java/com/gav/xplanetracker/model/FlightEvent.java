@@ -11,6 +11,7 @@ public class FlightEvent {
     private double latitude;
     private double longitude;
     private double groundSpeed;
+    private long flightId;
 
     public FlightEvent() {}
 
@@ -60,6 +61,14 @@ public class FlightEvent {
 
     public void setGroundSpeed(double groundSpeed) {
         this.groundSpeed = groundSpeed;
+    }
+
+    public long getFlightId() {
+        return flightId;
+    }
+
+    public void setFlightId(long flightId) {
+        this.flightId = flightId;
     }
 
     @Override

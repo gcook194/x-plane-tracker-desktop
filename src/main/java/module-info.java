@@ -18,4 +18,5 @@ module com.gav.xplanetracker {
     exports com.gav.xplanetracker.scheduler;
     opens com.gav.xplanetracker.scheduler to javafx.fxml;
     opens db.migration;
+    exports com.gav.xplanetracker.dto.xplane to com.fasterxml.jackson.databind;
 }
