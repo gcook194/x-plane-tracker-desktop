@@ -2,6 +2,7 @@ package com.gav.xplanetracker.dto.xplane;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+// TODO can the json prop annotations be moved back onto the fields?
 public class XplaneDataRefDTO {
 
     private String id;
