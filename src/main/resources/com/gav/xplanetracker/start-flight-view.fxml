@@ -46,29 +46,30 @@
                     <Label text="Loading flight data..." />
                 </VBox>
 
+                <VBox fx:id="flightInfoBox" alignment="CENTER" spacing="5" styleClass="flight-info-box" visible="false" managed="false">
+                    <Label fx:id="flightCodeLabel" styleClass="flight-code"/>
+                    <Label fx:id="routeLabel" styleClass="route-code"/>
+                    <Label fx:id="fullRouteLabel" styleClass="full-route"/>
+                </VBox>
+
                 <!-- GridPane for flight data -->
-                <GridPane fx:id="flightDetailsBox" hgap="10" vgap="10" visible="false" managed="false">
-                    <columnConstraints>
-                        <ColumnConstraints halignment="RIGHT"/>
-                        <ColumnConstraints/>
-                    </columnConstraints>
+                <VBox fx:id="flightDetailsBox" visible="false" managed="false" spacing="10">
+                    <GridPane hgap="20" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="LEFT" percentWidth="20"/>
+                            <ColumnConstraints percentWidth="80"/>
+                        </columnConstraints>
 
-                    <Label text="Flight Number:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-title"/>
-                    <Label fx:id="flightNumber" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="label-value"/>
+                        <Label text="Aircraft Type" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-title"/>
+                        <Label fx:id="aircraftType" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="label-value"/>
 
-                    <Label text="Departure Airport:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-title"/>
-                    <Label fx:id="departureAirport" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="label-value"/>
+                        <Label text="Aircraft Reg" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-title"/>
+                        <Label fx:id="aircraftReg" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="label-value"/>
 
-                    <Label text="Arrival Airport:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-title"/>
-                    <Label fx:id="arrivalAirport" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="label-value"/>
-
-                    <Label text="Aircraft Type:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="label-title"/>
-                    <Label fx:id="aircraftType" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="label-value"/>
-
-                    <Label text="Aircraft Reg:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="label-title"/>
-                    <Label fx:id="aircraftReg" GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="label-value"/>
-                </GridPane>
-
+                        <Label text="Route" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-title" />
+                        <Label fx:id="flightRoute" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="label-value" wrapText="true"/>
+                    </GridPane>
+                </VBox>
             </VBox>
 
             <!-- Right Panel (2/3 width - Map Panel) -->

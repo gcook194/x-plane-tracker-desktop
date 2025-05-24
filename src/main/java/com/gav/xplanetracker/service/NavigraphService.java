@@ -47,12 +47,15 @@ public class NavigraphService {
         final JsonNode generalNode = navigraphResponse.path("general");
         final String airline = generalNode.path("icao_airline").asText();
         final String flightNumber = generalNode.path("flight_number").asText();
+        final String route = generalNode.path("route").asText();
 
         System.out.println("General - airline - " + airline);
         System.out.println("General - flight number - " + flightNumber);
+        System.out.println("General - route - " + route);
 
         flightPlan.setFlightNumber(flightNumber);
         flightPlan.setIcaoAirline(airline);
+        flightPlan.setRoute(route);
     }
 
     private void setOriginDetails(final JsonNode navigraphResponse, final NavigraphFlightPlan flightPlan) {

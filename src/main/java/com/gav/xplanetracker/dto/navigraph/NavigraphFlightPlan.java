@@ -12,6 +12,7 @@ public class NavigraphFlightPlan {
     private Airport departure;
     private Airport arrival;
     private List<Waypoint> waypoints;
+    private String route;
 
     public NavigraphFlightPlan() {
         this.departure = new Airport();
@@ -73,6 +74,14 @@ public class NavigraphFlightPlan {
 
     public void setWaypoints(List<Waypoint> waypoints) {
         this.waypoints = waypoints;
+    }
+
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
     }
 
     public void addWaypoints(List<Waypoint> waypoints) {

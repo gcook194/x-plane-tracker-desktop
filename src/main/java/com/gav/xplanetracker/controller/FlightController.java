@@ -37,22 +37,13 @@ public class FlightController {
     }
 
     @FXML
-    private Label departureAirport;
-
-    @FXML
-    private Label arrivalAirport;
-
-    @FXML
     private Label aircraftType;
 
     @FXML
     private Label aircraftReg;
 
     @FXML
-    private Label flightNumber;
-
-    @FXML
-    private GridPane flightDetailsBox;
+    private VBox flightDetailsBox;
 
     @FXML
     private VBox loadingBox;
@@ -88,6 +79,21 @@ public class FlightController {
     private Label successMessage;
 
     @FXML
+    private Label flightRoute;
+
+    @FXML
+    private Label flightCodeLabel;
+
+    @FXML
+    private Label routeLabel;
+
+    @FXML
+    private Label fullRouteLabel;
+
+    @FXML
+    private VBox flightInfoBox;
+
+    @FXML
     public void initialize() {
         handleSimulatorState();
 
@@ -118,6 +124,9 @@ public class FlightController {
                 flightDetailsBox.setVisible(true);
                 flightDetailsBox.setManaged(true);
 
+                flightInfoBox.setVisible(true);
+                flightInfoBox.setManaged(true);
+
                 startFlight.setVisible(false);
                 startFlight.setManaged(false);
 
@@ -125,11 +134,21 @@ public class FlightController {
                 stopFlight.setManaged(true);
 
                 final Flight flight = getValue();
-                flightNumber.setText(flight.getFlightNumberIcao());
-                departureAirport.setText(flight.getDepartureAirportIcao());
-                arrivalAirport.setText(flight.getArrivalAirportIcao());
                 aircraftType.setText(flight.getAircraftTypeIcao());
                 aircraftReg.setText(flight.getAircraftReg());
+                flightRoute.setText(navigraphFlightPlan.getRoute());
+                flightCodeLabel.setText(flight.getFlightNumberIcao());
+                routeLabel.setText(
+                        String.format("%s -> %s", flight.getDepartureAirportIcao(), flight.getArrivalAirportIcao())
+                );
+                fullRouteLabel.setText(
+                        String.format(
+                                "%s to %s",
+                                navigraphFlightPlan.getDeparture().getName(),
+                                navigraphFlightPlan.getArrival().getName()
+                        )
+                );
+
 
                 loadMap(true);
             }
@@ -151,6 +170,8 @@ public class FlightController {
         stopFlight.setManaged(false);
         flightDetailsBox.setVisible(false);
         flightDetailsBox.setManaged(false);
+        flightInfoBox.setVisible(false);
+        flightInfoBox.setManaged(false);
         startFlight.setVisible(true);
         startFlight.setManaged(true);
         loadMap(false);
@@ -215,7 +236,7 @@ public class FlightController {
         final boolean isSimulatorRunning = xPlaneService.isSimulatorRunning();
 
         if (!isSimulatorRunning) {
-            errorMessage.setText("X-Plane is not connected!");
+            errorMessage.setText("X-Plane is not connected! Flight events won't be tracked.");
             errorBanner.setManaged(true);
             errorBanner.setVisible(true);
         } else {
