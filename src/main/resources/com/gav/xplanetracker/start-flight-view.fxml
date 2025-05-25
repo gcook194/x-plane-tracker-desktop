@@ -42,7 +42,7 @@
                 <Button fx:id="stopFlight" text="Complete Flight" onAction="#onStopFlightClick" visible="false" styleClass="primary-button" maxWidth="Infinity"/>
 
                 <VBox fx:id="loadingBox" spacing="10" alignment="CENTER" visible="false" managed="false">
-                    <ProgressIndicator fx:id="progressIndicator"/>
+                    <ProgressIndicator />
                     <Label text="Loading flight data..." />
                 </VBox>
 

@@ -57,9 +57,6 @@ public class FlightController {
     private VBox loadingBox;
 
     @FXML
-    private ProgressIndicator progressIndicator;
-
-    @FXML
     private Button startFlight;
 
     @FXML
@@ -189,8 +186,7 @@ public class FlightController {
     }
 
     private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
-        // TODO test with a west to east flight plan
-        // draws lines east to west if necessary
+        // fixes issue where negative longitudes always display to the east on the map
         if (longitude < 0) {
             longitude += 360;
         }
