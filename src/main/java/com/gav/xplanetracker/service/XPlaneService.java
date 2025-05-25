@@ -2,7 +2,6 @@ package com.gav.xplanetracker.service;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +27,9 @@ public class XPlaneService {
         return INSTANCE;
     }
 
-    public boolean isSimulatorRunning() {
+    public boolean isSimulatorRunning(String xplaneHost) {
         final Request request = new Request.Builder()
-                .url("http://localhost:8086/api/v2/datarefs")
+                .url(xplaneHost)
                 .build();
 
         try (ResponseBody body = client.newCall(request).execute().body()) {

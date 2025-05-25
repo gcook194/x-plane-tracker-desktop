@@ -129,4 +129,10 @@
     -fx-font-weight: bold;
     -fx-text-fill: #dddddd;
 }
+
+.text-field, .radio-button {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: white;
+}
+
 ``

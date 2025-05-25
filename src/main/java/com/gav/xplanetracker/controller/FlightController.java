@@ -2,25 +2,30 @@ package com.gav.xplanetracker.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gav.xplanetracker.dto.ApplicationSettingsDTO;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.NavigraphService;
+import com.gav.xplanetracker.service.SettingsService;
 import com.gav.xplanetracker.service.XPlaneService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 public class FlightController {
@@ -30,6 +35,7 @@ public class FlightController {
     private final FlightService flightService;
     private final NavigraphService navigraphService;
     private final XPlaneService xPlaneService;
+    private final SettingsService settingsService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
@@ -39,6 +45,7 @@ public class FlightController {
         this.flightService = FlightService.getInstance();
         this.navigraphService = NavigraphService.getInstance();
         this.xPlaneService = XPlaneService.getInstance();
+        this.settingsService = SettingsService.getInstance();
 
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
@@ -99,9 +106,21 @@ public class FlightController {
     private VBox flightInfoBox;
 
     @FXML
-    public void initialize() {
-        handleSimulatorState();
+    private StackPane mainContent;
 
+    @FXML
+    private Button settingsButton;
+
+    @FXML
+    private Button dashboardButton;
+
+    @FXML
+    public void initialize() {
+        //TODO this doesn't work correctly - fix
+        settingsButton.setOnAction(event -> loadView("/com/gav/xplanetracker/settings-view.fxml"));
+        dashboardButton.setOnAction(event -> loadView("/com/gav/xplanetracker/start-flight-view.fxml"));
+
+        handleSimulatorState();
         navigraphFlightPlan = navigraphService.getFlightPlan();
 
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
@@ -265,7 +284,8 @@ public class FlightController {
 
     //TODO this could probably be done as a single HBox and label but I am too stupid
     public void handleSimulatorState() {
-        final boolean isSimulatorRunning = xPlaneService.isSimulatorRunning();
+        final ApplicationSettingsDTO settings = settingsService.getSettings();
+        final boolean isSimulatorRunning = xPlaneService.isSimulatorRunning(settings.xplaneHost());
 
         if (!isSimulatorRunning) {
             errorMessage.setText("X-Plane is not connected! Flight events won't be tracked.");
@@ -275,6 +295,17 @@ public class FlightController {
             successMessage.setText("X-Plane is connected!");
             successBanner.setManaged(true);
             successBanner.setVisible(true);
+        }
+    }
+
+    private void loadView(final String view) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(view));
+            Parent settingsRoot = loader.load();
+
+            mainContent.getChildren().setAll(settingsRoot); // Replace current content
+        } catch (IOException e) {
+            logger.error("Error when switching views: ", e);
         }
     }
 }

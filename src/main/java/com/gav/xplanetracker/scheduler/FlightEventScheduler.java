@@ -1,7 +1,9 @@
 package com.gav.xplanetracker.scheduler;
 
+import com.gav.xplanetracker.dto.ApplicationSettingsDTO;
 import com.gav.xplanetracker.service.EventService;
 import com.gav.xplanetracker.service.FlightService;
+import com.gav.xplanetracker.service.SettingsService;
 import com.gav.xplanetracker.service.XPlaneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +22,13 @@ public class FlightEventScheduler {
     private final FlightService flightService;
     private final XPlaneService xPlaneService;
     private final EventService eventService;
+    private final SettingsService settingsService;
 
     public FlightEventScheduler() {
         this.flightService = FlightService.getInstance();
         this.xPlaneService = XPlaneService.getInstance();
         this.eventService = EventService.getInstance();
+        this.settingsService = SettingsService.getInstance();
     }
 
     public static FlightEventScheduler getInstance() {
@@ -35,9 +39,10 @@ public class FlightEventScheduler {
     }
 
     public void startFetching() {
+        final ApplicationSettingsDTO settings = settingsService.getSettings();
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                if (!xPlaneService.isSimulatorRunning()) {
+                if (!xPlaneService.isSimulatorRunning(settings.xplaneHost())) {
                     logger.info("X-Plane must be running to capture events");
                     return;
                 }
