@@ -204,6 +204,7 @@ public class FlightController {
         loadMap(false, null);
     }
 
+    // TODO move to service layer
     private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
         // fixes issue where negative longitudes always display to the east on the map
         if (longitude < 0) {
@@ -214,6 +215,7 @@ public class FlightController {
         webEngine.executeScript(script);
     }
 
+    // TODO move to service layer
     private void drawActualRoute(Flight flight) {
         final List<FlightEvent> events = flightService.getFlightEvents(flight);
         final List<double[]> latLongs = events.stream()
@@ -300,8 +302,8 @@ public class FlightController {
 
     private void loadView(final String view) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(view));
-            Parent settingsRoot = loader.load();
+            final FXMLLoader loader = new FXMLLoader(getClass().getResource(view));
+            final Parent settingsRoot = loader.load();
 
             mainContent.getChildren().setAll(settingsRoot); // Replace current content
         } catch (IOException e) {
