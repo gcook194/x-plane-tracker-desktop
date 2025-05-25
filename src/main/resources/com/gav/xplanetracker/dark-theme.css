@@ -135,4 +135,51 @@
     -fx-text-fill: white;
 }
 
+.tab-pane .tab-header-background {
+    -fx-background-color: #252525;
+}
+
+/* Header area (tab bar) */
+.tab-pane .tab-header-area {
+    -fx-background-color: #1e1e1e;
+}
+
+/* Entire content area behind tabs */
+.tab-pane .tab-content-area {
+    -fx-background-color: #252525;
+}
+
+/* Force tab content to match background */
+.tab-pane .tab {
+    -fx-background-color: #2e2e2e;
+    -fx-text-fill: #bbbbbb;
+    -fx-border-radius: 5;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.tab-pane .tab-label {
+    -fx-text-fill: #bbbbbb;
+}
+
+/* Override background of each tab's content */
+.tab {
+    -fx-background-insets: 0;
+}
+
+.tab:selected {
+    -fx-background-insets: 0;
+}
+
+.tab-content-area, .tab {
+    -fx-background-color: #252525;
+}
+
 ``

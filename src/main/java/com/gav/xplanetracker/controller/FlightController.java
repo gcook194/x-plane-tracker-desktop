@@ -37,6 +37,9 @@ public class FlightController {
     final WebView webView;
     final WebEngine webEngine;
 
+    final WebView navigraphWebView;
+    final WebEngine navigraphWebEngine;
+
     public FlightController() {
         this.flightService = FlightService.getInstance();
         this.navigraphService = NavigraphService.getInstance();
@@ -45,6 +48,9 @@ public class FlightController {
 
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
+
+        this.navigraphWebView = new WebView();
+        this.navigraphWebEngine = navigraphWebView.getEngine();
     }
 
     @FXML
@@ -64,9 +70,6 @@ public class FlightController {
 
     @FXML
     private Button stopFlight;
-
-    @FXML
-    private VBox mapPanel;
 
     @FXML
     private VBox leftPanel;
@@ -100,6 +103,15 @@ public class FlightController {
 
     @FXML
     private VBox flightInfoBox;
+
+    @FXML
+    private VBox mapPanel;
+
+    @FXML
+    private VBox navigraphMapPanel;
+
+    @FXML
+    private VBox activeFlightMapPanel;
 
     @FXML
     public void initialize() {
@@ -194,6 +206,47 @@ public class FlightController {
         }
     }
 
+    private void loadNavigraphMap() {
+        navigraphWebEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
+
+        navigraphWebEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                navigraphWebEngine.executeScript("loadMap();");
+                    addMarker(
+                            navigraphWebEngine,
+                            navigraphFlightPlan.getDeparture().getLatitude(),
+                            navigraphFlightPlan.getDeparture().getLongitude(),
+                            navigraphFlightPlan.getDeparture().getName()
+                    );
+
+                    navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
+                        addMarker(
+                                navigraphWebEngine,
+                                waypoint.getLatitude(),
+                                waypoint.getLongitude(),
+                                waypoint.getName()
+                        );
+                    });
+
+                    addMarker(
+                            navigraphWebEngine,
+                            navigraphFlightPlan.getArrival().getLatitude(),
+                            navigraphFlightPlan.getArrival().getLongitude(),
+                            navigraphFlightPlan.getArrival().getName()
+                    );
+
+                navigraphWebEngine.executeScript("drawBasicRouteLine();");
+                navigraphWebEngine.executeScript("fitToAllMarkers();");
+            }
+        });
+
+        navigraphWebView.prefWidthProperty().bind(mapPanel.widthProperty());
+        navigraphWebView.prefHeightProperty().bind(mapPanel.heightProperty());
+
+        navigraphMapPanel.getChildren().clear();
+        navigraphMapPanel.getChildren().add(navigraphWebView);
+    }
+
     private void loadMap(boolean drawFlightDetails, Flight flight) {
         webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
 
@@ -201,32 +254,6 @@ public class FlightController {
             if (newState == Worker.State.SUCCEEDED) {
                 webEngine.executeScript("loadMap();");
                 if (drawFlightDetails) {
-//                    addMarker(
-//                            webEngine,
-//                            navigraphFlightPlan.getDeparture().getLatitude(),
-//                            navigraphFlightPlan.getDeparture().getLongitude(),
-//                            navigraphFlightPlan.getDeparture().getName()
-//                    );
-//
-//                    navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
-//                        addMarker(
-//                                webEngine,
-//                                waypoint.getLatitude(),
-//                                waypoint.getLongitude(),
-//                                waypoint.getName()
-//                        );
-//                    });
-//
-//                    addMarker(
-//                            webEngine,
-//                            navigraphFlightPlan.getArrival().getLatitude(),
-//                            navigraphFlightPlan.getArrival().getLongitude(),
-//                            navigraphFlightPlan.getArrival().getName()
-//                    );
-
-                    // webEngine.executeScript("drawBasicRouteLine();");
-                    // webEngine.executeScript("fitToAllMarkers();");
-
                     drawActualRoute(flight);
                 }
             }
@@ -235,8 +262,8 @@ public class FlightController {
         webView.prefWidthProperty().bind(mapPanel.widthProperty());
         webView.prefHeightProperty().bind(mapPanel.heightProperty());
 
-        mapPanel.getChildren().clear();
-        mapPanel.getChildren().add(webView);
+        activeFlightMapPanel.getChildren().clear();
+        activeFlightMapPanel.getChildren().add(webView);
     }
 
     //TODO this could probably be done as a single HBox and label but I am too stupid
@@ -287,6 +314,7 @@ public class FlightController {
         );
 
 
+        loadNavigraphMap();
         loadMap(true, flight);
     }
 }

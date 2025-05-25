@@ -57,8 +57,27 @@
 
                 <!-- Right Panel (2/3 width - Map Panel) -->
                 <!-- TODO this panel could be a component -->
+
                 <VBox fx:id="mapPanel" styleClass="map-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns:fx="http://javafx.com/fxml">
-                    <Label text="Map Panel (coming soon)" styleClass="panel-title"/>
+                    <TabPane fx:id="mapTabPane" tabClosingPolicy="UNAVAILABLE" style="-fx-background-color: red;">
+                            <Tab text="Navigraph Flight Plan">
+                                <!-- You can put a WebView or other layout here -->
+                                <AnchorPane>
+                                    <VBox fx:id="navigraphMapPanel">
+                                        <!-- populated with javascript -->
+                                    </VBox>
+                                </AnchorPane>
+                            </Tab>
+
+                            <Tab text="Active Flight Progress">
+                                <AnchorPane>
+                                    <VBox fx:id="activeFlightMapPanel">
+                                        <!-- populated with javascript -->
+                                    </VBox>
+                                </AnchorPane>
+                            </Tab>
+                    </TabPane>
+
                 </VBox>
 
             </HBox>
