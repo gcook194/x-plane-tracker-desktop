@@ -21,7 +21,7 @@ public class XplaneTrackerApplication extends Application {
     public void start(Stage stage) throws IOException {
         DatabaseMigration.runMigrations("src/main/resources/db/sqlite/flights.db");
 
-        FXMLLoader fxmlLoader = new FXMLLoader(XplaneTrackerApplication.class.getResource("start-flight-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(XplaneTrackerApplication.class.getResource("base-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1920, 1080);
         stage.setTitle("X-Plane Flight Tracker");
         stage.setScene(scene);

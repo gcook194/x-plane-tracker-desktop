@@ -13,19 +13,15 @@ import com.gav.xplanetracker.service.XPlaneService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
 public class FlightController {
@@ -106,20 +102,7 @@ public class FlightController {
     private VBox flightInfoBox;
 
     @FXML
-    private StackPane mainContent;
-
-    @FXML
-    private Button settingsButton;
-
-    @FXML
-    private Button dashboardButton;
-
-    @FXML
     public void initialize() {
-        //TODO this doesn't work correctly - fix
-        settingsButton.setOnAction(event -> loadView("/com/gav/xplanetracker/settings-view.fxml"));
-        dashboardButton.setOnAction(event -> loadView("/com/gav/xplanetracker/start-flight-view.fxml"));
-
         handleSimulatorState();
         navigraphFlightPlan = navigraphService.getFlightPlan();
 
@@ -297,17 +280,6 @@ public class FlightController {
             successMessage.setText("X-Plane is connected!");
             successBanner.setManaged(true);
             successBanner.setVisible(true);
-        }
-    }
-
-    private void loadView(final String view) {
-        try {
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource(view));
-            final Parent settingsRoot = loader.load();
-
-            mainContent.getChildren().setAll(settingsRoot); // Replace current content
-        } catch (IOException e) {
-            logger.error("Error when switching views: ", e);
         }
     }
 }

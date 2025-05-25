@@ -1,30 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-
-<?import java.net.URL?>
+<?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.gav.xplanetracker.controller.FlightController">
 
-    <stylesheets>
-        <URL value="@dark-theme.css"/>
-    </stylesheets>
-
-    <!-- Top Navigation Bar -->
-    <top>
-        <HBox fx:id="navBar" styleClass="nav-bar" prefHeight="50" alignment="CENTER_LEFT" spacing="10">
-            <Label text="✈ Flight Tracker" styleClass="nav-title"/>
-            <Button text="Dashboard" styleClass="nav-button" fx:id="dashboardButton"/>
-            <Button text="Settings" styleClass="nav-button" fx:id="settingsButton"/>
-        </HBox>
-    </top>
-
-    <!-- Main Layout -->
     <center>
-        <StackPane fx:id="mainContent">
+        <StackPane>
             <HBox fx:id="rootBox">
-
-                <!-- Left Panel (1/3 width) -->
                 <!-- TODO this panel could be a component -->
                 <VBox fx:id="leftPanel" styleClass="side-panel" maxWidth="Infinity">
 

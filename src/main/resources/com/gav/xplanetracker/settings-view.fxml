@@ -9,12 +9,7 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.gav.xplanetracker.controller.SettingsController">
     <center>
-        <StackPane fx:id="mainContent">
-            <stylesheets>
-                <URL value="@dark-theme.css"/>
-            </stylesheets>
-
-            <!-- HBox to align the form to the left -->
+        <StackPane>
             <HBox alignment="TOP_LEFT">
                 <padding>
                     <Insets top="30" right="30" bottom="30" left="30"/>
@@ -22,21 +17,18 @@
                 <VBox spacing="25" styleClass="side-panel" maxWidth="500" prefWidth="500">
                     <Label text="Application Settings" styleClass="panel-title"/>
 
-                    <!-- SimBrief Username -->
                     <VBox spacing="8">
                         <Label text="SimBrief Username" styleClass="label-title"/>
                         <TextField fx:id="simbriefUsernameField"
                                    style="-fx-background-color: #3a3a3a; -fx-text-fill: white;"/>
                     </VBox>
 
-                    <!-- X-Plane URI -->
                     <VBox spacing="8">
                         <Label text="X-Plane Host" styleClass="label-title"/>
                         <TextField fx:id="xplaneUriField"
                                    style="-fx-background-color: #3a3a3a; -fx-text-fill: white;"/>
                     </VBox>
 
-                    <!-- Navigraph API Radio Buttons -->
                     <VBox spacing="8">
                         <Label text="Use Navigraph API?" styleClass="label-title"/>
                         <HBox spacing="20">
@@ -53,7 +45,6 @@
                         </HBox>
                     </VBox>
 
-                    <!-- Save Button -->
                     <VBox spacing="8">
                         <padding>
                             <Insets top="10"/>
@@ -64,7 +55,6 @@
                                 onAction="#handleSaveClick"
                                 maxWidth="200"/>
                     </VBox>
-
                 </VBox>
             </HBox>
         </StackPane>
