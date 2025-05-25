@@ -108,7 +108,11 @@ public class FlightController {
 
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
-        loadMap(false, null);
+
+        flightService.getCurrentFlight().ifPresentOrElse(
+                this::activeFlightView,
+                () -> loadMap(false, null)
+        );
     }
 
     @FXML
@@ -125,39 +129,7 @@ public class FlightController {
             @Override
             protected void succeeded() {
                 super.succeeded();
-                loadingBox.setVisible(false);
-                loadingBox.setManaged(false);
-
-                flightDetailsBox.setVisible(true);
-                flightDetailsBox.setManaged(true);
-
-                flightInfoBox.setVisible(true);
-                flightInfoBox.setManaged(true);
-
-                startFlight.setVisible(false);
-                startFlight.setManaged(false);
-
-                stopFlight.setVisible(true);
-                stopFlight.setManaged(true);
-
-                final Flight flight = getValue();
-                aircraftType.setText(flight.getAircraftTypeIcao());
-                aircraftReg.setText(flight.getAircraftReg());
-                flightRoute.setText(navigraphFlightPlan.getRoute());
-                flightCodeLabel.setText(flight.getFlightNumberIcao());
-                routeLabel.setText(
-                        String.format("%s -> %s", flight.getDepartureAirportIcao(), flight.getArrivalAirportIcao())
-                );
-                fullRouteLabel.setText(
-                        String.format(
-                                "%s to %s",
-                                navigraphFlightPlan.getDeparture().getName(),
-                                navigraphFlightPlan.getArrival().getName()
-                        )
-                );
-
-
-                loadMap(true, flight);
+                activeFlightView(getValue());
             }
 
             @Override
@@ -173,7 +145,7 @@ public class FlightController {
 
     @FXML
     protected void onStopFlightClick() {
-        //flightService.completeActiveFlight();
+        flightService.completeActiveFlight();
 
         stopFlight.setVisible(false);
         stopFlight.setManaged(false);
@@ -281,5 +253,40 @@ public class FlightController {
             successBanner.setManaged(true);
             successBanner.setVisible(true);
         }
+    }
+
+    private void activeFlightView(Flight flight) {
+        loadingBox.setVisible(false);
+        loadingBox.setManaged(false);
+
+        flightDetailsBox.setVisible(true);
+        flightDetailsBox.setManaged(true);
+
+        flightInfoBox.setVisible(true);
+        flightInfoBox.setManaged(true);
+
+        startFlight.setVisible(false);
+        startFlight.setManaged(false);
+
+        stopFlight.setVisible(true);
+        stopFlight.setManaged(true);
+
+        aircraftType.setText(flight.getAircraftTypeIcao());
+        aircraftReg.setText(flight.getAircraftReg());
+        flightRoute.setText(navigraphFlightPlan.getRoute());
+        flightCodeLabel.setText(flight.getFlightNumberIcao());
+        routeLabel.setText(
+                String.format("%s -> %s", flight.getDepartureAirportIcao(), flight.getArrivalAirportIcao())
+        );
+        fullRouteLabel.setText(
+                String.format(
+                        "%s to %s",
+                        navigraphFlightPlan.getDeparture().getName(),
+                        navigraphFlightPlan.getArrival().getName()
+                )
+        );
+
+
+        loadMap(true, flight);
     }
 }
