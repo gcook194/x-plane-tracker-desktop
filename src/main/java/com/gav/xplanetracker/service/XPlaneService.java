@@ -2,6 +2,8 @@ package com.gav.xplanetracker.service;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +29,12 @@ public class XPlaneService {
     }
 
     public boolean isSimulatorRunning() {
-        try {
-            final Request request = new Request.Builder()
-                    .url("http://localhost:8086/api/v2/datarefs")
-                    .build();
+        final Request request = new Request.Builder()
+                .url("http://localhost:8086/api/v2/datarefs")
+                .build();
 
-            client.newCall(request).execute();
+        try (ResponseBody body = client.newCall(request).execute().body()) {
+            logger.info(body.string());
         } catch (IOException e) {
             logger.warn("Simulator is not running or may be exposing a different port - check X-Plane settings");
             return false;

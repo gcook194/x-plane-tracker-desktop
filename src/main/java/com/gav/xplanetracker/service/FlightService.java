@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class FlightService {
+public class FlightService {
 
     private static final Logger logger = LoggerFactory.getLogger(FlightService.class);
 

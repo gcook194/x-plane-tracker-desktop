@@ -7,7 +7,6 @@ import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
-import com.squareup.okhttp.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,14 +71,12 @@ public class EventService {
                 .build();
 
         try {
-            final ResponseBody body = client.newCall(request)
+            final String body = client.newCall(request)
                     .execute()
-                    .body();
+                    .body()
+                    .string();
             final ObjectMapper mapper = new ObjectMapper();
-            final XplaneDataRefListDTO dto = mapper.readValue(body.string(), XplaneDataRefListDTO.class);
-            body.close();
-
-            return dto;
+            return mapper.readValue(body, XplaneDataRefListDTO.class);
         } catch (IOException e) {
             logger.error("Error when fetching dataRefs: ", e);
             throw new RuntimeException(e);
@@ -98,12 +95,12 @@ public class EventService {
                 .build();
 
         try {
-            final ResponseBody body = client.newCall(request)
+            final String body = client.newCall(request)
                     .execute()
-                    .body();
+                    .body()
+                    .string();
             final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
-            body.close();
+            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
@@ -128,12 +125,12 @@ public class EventService {
                 .build();
 
         try {
-            final ResponseBody body = client.newCall(request)
+            final String body = client.newCall(request)
                     .execute()
-                    .body();
+                    .body()
+                    .string();
             final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
-            body.close();
+            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
@@ -158,12 +155,12 @@ public class EventService {
                 .build();
 
         try {
-            final ResponseBody body = client.newCall(request)
+            final String body = client.newCall(request)
                     .execute()
-                    .body();
+                    .body()
+                    .string();
             final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
-            body.close();
+            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
@@ -188,12 +185,12 @@ public class EventService {
                 .build();
 
         try {
-            final ResponseBody body = client.newCall(request)
+            final String body = client.newCall(request)
                     .execute()
-                    .body();
+                    .body()
+                    .string();
             final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body.string(), XplaneApiResponse.class);
-            body.close();
+            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
