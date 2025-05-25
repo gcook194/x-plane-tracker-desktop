@@ -7,4 +7,4 @@ CREATE TABLE settings (
 
 -- will eventually be replaced with a UI
 INSERT INTO settings (use_navigraph_api, simbrief_username)
-    VALUES (0, 'Gavin194');
+    VALUES (1, 'Gavin194');
