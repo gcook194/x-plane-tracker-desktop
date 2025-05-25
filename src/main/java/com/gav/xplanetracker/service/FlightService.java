@@ -1,23 +1,27 @@
 package com.gav.xplanetracker.service;
 
 import com.gav.xplanetracker.dao.FlightDaoJDBC;
+import com.gav.xplanetracker.dao.FlightEventDaoJDBC;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightStatus;
 import com.gav.xplanetracker.model.Flight;
+import com.gav.xplanetracker.model.FlightEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public final class FlightService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FlightService.class);
+
     private static FlightService INSTANCE;
 
     private final FlightDaoJDBC flightDao;
-
-    public FlightService() {
-        this.flightDao = FlightDaoJDBC.getInstance();
-    }
+    private final FlightEventDaoJDBC flightEventDao;
 
     public static FlightService getInstance() {
         if (INSTANCE == null) {
@@ -26,13 +30,18 @@ public final class FlightService {
         return INSTANCE;
     }
 
+    public FlightService() {
+        this.flightDao = FlightDaoJDBC.getInstance();
+        this.flightEventDao = FlightEventDaoJDBC.getInstance();
+    }
+
     public Flight getOrCreateCurrentFlight(final NavigraphFlightPlan navigraphFlightPlan) {
         return getCurrentFlight()
                 .orElseGet(() -> startFlight(navigraphFlightPlan));
     }
 
     public Flight startFlight(final NavigraphFlightPlan navigraphFlightPlan) {
-        System.out.println("Starting Flight");
+        logger.info("Starting flight");
 
         // TODO look at lombok, mapstruct or create a builder class
         final Flight flight = new Flight();
@@ -56,5 +65,17 @@ public final class FlightService {
 
     public Optional<Flight> getCurrentFlight() {
         return Optional.ofNullable(flightDao.getFlightByStatus(FlightStatus.IN_PROGRESS));
+    }
+
+    public void completeActiveFlight() {
+        getCurrentFlight().ifPresent(this::completeFlight);
+    }
+
+    private void completeFlight(Flight flight) {
+        flightDao.completeFlight(flight);
+    }
+
+    public List<FlightEvent> getFlightEvents(Flight flight) {
+        return flightEventDao.getFlightEvents(flight);
     }
 }

@@ -1,7 +1,5 @@
 package com.gav.xplanetracker.service;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dao.FlightEventDaoJDBC;
 import com.gav.xplanetracker.dto.xplane.*;
@@ -10,11 +8,15 @@ import com.gav.xplanetracker.model.FlightEvent;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.ResponseBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
 
 public class EventService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
     // TODO move this to a constants file
     public static final String XPLANE_API_ADDRESS = "http://localhost:8086/api/v2/datarefs";
@@ -42,7 +44,7 @@ public class EventService {
     }
 
     public void create(final Flight flight) {
-        System.out.println("Creating flight event for flight " + flight.getId());
+        logger.info("Creating flight event for flight {}", flight.getId());
 
         // The IDs we need to query on are generated every time the simulator starts
         final XplaneDataRefListDTO dataRefs = getDataRefs();
@@ -79,6 +81,7 @@ public class EventService {
 
             return dto;
         } catch (IOException e) {
+            logger.error("Error when fetching dataRefs: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -108,6 +111,7 @@ public class EventService {
 
             throw new RuntimeException("No density altitude returned from simulator API");
         } catch (IOException e) {
+            logger.error("Error when fetching pressure altitude: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -137,6 +141,7 @@ public class EventService {
 
             throw new RuntimeException("No density altitude returned from simulator API");
         } catch (IOException e) {
+            logger.error("Error when fetching ground speed: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -166,6 +171,7 @@ public class EventService {
 
             throw new RuntimeException("No density altitude returned from simulator API");
         } catch (IOException e) {
+            logger.error("Error when fetching latitude: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -195,6 +201,7 @@ public class EventService {
 
             throw new RuntimeException("No density altitude returned from simulator API");
         } catch (IOException e) {
+            logger.error("Error when fetching longitude: ", e);
             throw new RuntimeException(e);
         }
     }

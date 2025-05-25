@@ -3,12 +3,16 @@ package com.gav.xplanetracker.scheduler;
 import com.gav.xplanetracker.service.EventService;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.XPlaneService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class FlightEventScheduler {
+
+    private static final Logger logger = LoggerFactory.getLogger(FlightEventScheduler.class);
 
     private static FlightEventScheduler INSTANCE;
 
@@ -34,23 +38,23 @@ public class FlightEventScheduler {
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 if (!xPlaneService.isSimulatorRunning()) {
-                    System.out.println("X-Plane must be running to capture events");
+                    logger.info("X-Plane must be running to capture events");
                     return;
                 }
 
                 flightService.getCurrentFlight().ifPresentOrElse(
                         eventService::create,
-                        () -> System.out.println("No flights in progress - no events created")
+                        () -> logger.info("No flights in progress - no events created")
                 );
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error when executing scheduled task: ", e);
             }
         }, 0, 1, TimeUnit.MINUTES);
     }
 
     public void stopFetching() {
-        System.out.println(this.getClass().getName() + " Stopping scheduler");
+        logger.info("Stopping scheduler");
         scheduler.shutdownNow();
     }
 

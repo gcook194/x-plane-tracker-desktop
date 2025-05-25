@@ -2,6 +2,8 @@ package com.gav.xplanetracker.dao;
 
 import com.gav.xplanetracker.database.DatabaseConnection;
 import com.gav.xplanetracker.exceptions.SettingsPropertyNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SettingsDaoJDBC {
+
+    private static final Logger logger = LoggerFactory.getLogger(SettingsDaoJDBC.class);
 
     private static SettingsDaoJDBC INSTANCE;
 
@@ -28,8 +32,7 @@ public class SettingsDaoJDBC {
 
             return rs.getBoolean("use_navigraph_api");
         } catch (SQLException e) {
-            System.out.println("Could not get Navigraph Settings from database");
-            e.printStackTrace();
+            logger.error("Could not get Navigraph Settings from database", e);
 
             throw new SettingsPropertyNotFoundException("Could not get Navigraph API settings from database");
         }
@@ -44,8 +47,7 @@ public class SettingsDaoJDBC {
 
             return rs.getString("simbrief_username");
         } catch (SQLException e) {
-            System.out.println("Could not get Simbrief username from database");
-            e.printStackTrace();
+            logger.error("Could not get Simbrief username from database", e);
 
             throw new SettingsPropertyNotFoundException("Could not get Simbrief username from database");
         }

@@ -1,7 +1,10 @@
 package com.gav.xplanetracker.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.model.Flight;
+import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.NavigraphService;
 import com.gav.xplanetracker.service.XPlaneService;
@@ -11,14 +14,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.List;
 
 public class FlightController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FlightController.class);
 
     private final FlightService flightService;
     private final NavigraphService navigraphService;
@@ -31,9 +38,10 @@ public class FlightController {
     public FlightController() {
         this.flightService = FlightService.getInstance();
         this.navigraphService = NavigraphService.getInstance();
+        this.xPlaneService = XPlaneService.getInstance();
+
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
-        this.xPlaneService = XPlaneService.getInstance();
     }
 
     @FXML
@@ -101,7 +109,7 @@ public class FlightController {
 
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
-        loadMap(false);
+        loadMap(false, null);
     }
 
     @FXML
@@ -150,7 +158,7 @@ public class FlightController {
                 );
 
 
-                loadMap(true);
+                loadMap(true, flight);
             }
 
             @Override
@@ -166,6 +174,8 @@ public class FlightController {
 
     @FXML
     protected void onStopFlightClick() {
+        //flightService.completeActiveFlight();
+
         stopFlight.setVisible(false);
         stopFlight.setManaged(false);
         flightDetailsBox.setVisible(false);
@@ -174,7 +184,8 @@ public class FlightController {
         flightInfoBox.setManaged(false);
         startFlight.setVisible(true);
         startFlight.setManaged(true);
-        loadMap(false);
+
+        loadMap(false, null);
     }
 
     private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
@@ -188,38 +199,63 @@ public class FlightController {
         webEngine.executeScript(script);
     }
 
-    private void loadMap(boolean drawFlightDetails) {
+    private void drawActualRoute(Flight flight) {
+        final List<FlightEvent> events = flightService.getFlightEvents(flight);
+        final List<double[]> latLongs = events.stream()
+                .map(event -> {
+                    final double[] latLong = new double[2];
+                    latLong[0] = event.getLatitude();
+                    latLong[1] = event.getLongitude();
+
+                    return latLong;
+                })
+                .toList();
+
+        if (!latLongs.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String jsonLatLongs = mapper.writeValueAsString(latLongs);
+                webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs  +");");
+            } catch (JsonProcessingException e) {
+                logger.error("Could not parse latLong data to JSON", e);
+            }
+        }
+    }
+
+    private void loadMap(boolean drawFlightDetails, Flight flight) {
         webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
 
         webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 webEngine.executeScript("loadMap();");
                 if (drawFlightDetails) {
-                    addMarker(
-                            webEngine,
-                            navigraphFlightPlan.getDeparture().getLatitude(),
-                            navigraphFlightPlan.getDeparture().getLongitude(),
-                            navigraphFlightPlan.getDeparture().getName()
-                    );
+//                    addMarker(
+//                            webEngine,
+//                            navigraphFlightPlan.getDeparture().getLatitude(),
+//                            navigraphFlightPlan.getDeparture().getLongitude(),
+//                            navigraphFlightPlan.getDeparture().getName()
+//                    );
+//
+//                    navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
+//                        addMarker(
+//                                webEngine,
+//                                waypoint.getLatitude(),
+//                                waypoint.getLongitude(),
+//                                waypoint.getName()
+//                        );
+//                    });
+//
+//                    addMarker(
+//                            webEngine,
+//                            navigraphFlightPlan.getArrival().getLatitude(),
+//                            navigraphFlightPlan.getArrival().getLongitude(),
+//                            navigraphFlightPlan.getArrival().getName()
+//                    );
 
-                    navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
-                        addMarker(
-                                webEngine,
-                                waypoint.getLatitude(),
-                                waypoint.getLongitude(),
-                                waypoint.getName()
-                        );
-                    });
+                    // webEngine.executeScript("drawBasicRouteLine();");
+                    // webEngine.executeScript("fitToAllMarkers();");
 
-                    addMarker(
-                            webEngine,
-                            navigraphFlightPlan.getArrival().getLatitude(),
-                            navigraphFlightPlan.getArrival().getLongitude(),
-                            navigraphFlightPlan.getArrival().getName()
-                    );
-
-                    webEngine.executeScript("drawBasicRouteLine();");
-                    webEngine.executeScript("fitToAllMarkers();");
+                    drawActualRoute(flight);
                 }
             }
         });

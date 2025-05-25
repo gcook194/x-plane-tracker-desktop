@@ -2,10 +2,14 @@ package com.gav.xplanetracker.service;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class XPlaneService {
+
+    private static final Logger logger = LoggerFactory.getLogger(XPlaneService.class);
 
     private static XPlaneService INSTANCE;
 
@@ -30,11 +34,11 @@ public class XPlaneService {
 
             client.newCall(request).execute();
         } catch (IOException e) {
-            System.out.println("Simulator is not running or may be exposing a different port - check X-Plane settings");
+            logger.warn("Simulator is not running or may be exposing a different port - check X-Plane settings");
             return false;
         }
 
-        System.out.println("Simulator is running");
+        logger.info("Simulator is running");
         return true;
     }
 }

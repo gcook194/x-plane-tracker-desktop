@@ -10,6 +10,8 @@ import com.gav.xplanetracker.dto.navigraph.Waypoint;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NavigraphService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NavigraphService.class);
 
     public static final String SIMBRIEF_URI = "https://www.simbrief.com/api/xml.fetcher.php";
     private static NavigraphService INSTANCE;
@@ -49,9 +53,9 @@ public class NavigraphService {
         final String flightNumber = generalNode.path("flight_number").asText();
         final String route = generalNode.path("route").asText();
 
-        System.out.println("General - airline - " + airline);
-        System.out.println("General - flight number - " + flightNumber);
-        System.out.println("General - route - " + route);
+        logger.info("General - airline - {}",  airline);
+        logger.info("General - flight number - {}", flightNumber);
+        logger.info("General - route - {}", route);
 
         flightPlan.setFlightNumber(flightNumber);
         flightPlan.setIcaoAirline(airline);
@@ -65,7 +69,10 @@ public class NavigraphService {
         final double latitude = originNode.path("pos_lat").asDouble();
         final double longitude = originNode.path("pos_long").asDouble();
 
-        System.out.println("Origin - departure airport - " + icaoCode);
+        logger.info("Origin - arrival airport - {}", icaoCode);
+        logger.info("Origin - name - {}", name);
+        logger.info("Origin - latitude - {}", latitude);
+        logger.info("Origin - longitude - {}", longitude);
 
         flightPlan.getDeparture().setIcaoCode(icaoCode);
         flightPlan.getDeparture().setName(name);
@@ -80,7 +87,10 @@ public class NavigraphService {
         final double latitude = destinationNode.path("pos_lat").asDouble();
         final double longitude = destinationNode.path("pos_long").asDouble();
 
-        System.out.println("Destination - arrival airport - " + icaoCode);
+        logger.info("Destination - arrival airport - {}", icaoCode);
+        logger.info("Destination - name - {}", name);
+        logger.info("Destination - latitude - {}", latitude);
+        logger.info("Destination - longitude - {}", longitude);
 
         flightPlan.getArrival().setIcaoCode(icaoCode);
         flightPlan.getArrival().setName(name);
@@ -93,8 +103,8 @@ public class NavigraphService {
         final String aircraftType = aircraftNode.path("icaocode").asText();
         final String aircraftReg = aircraftNode.path("reg").asText();
 
-        System.out.println("Aircraft - type - " + aircraftType);
-        System.out.println("Aircraft - registration - " + aircraftReg);
+        logger.info("Aircraft - type - {}", aircraftType);
+        logger.info("Aircraft - registration - {}", aircraftReg);
 
         flightPlan.setAircraftType(aircraftType);
         flightPlan.setAircraftRegistration(aircraftReg);
@@ -104,7 +114,7 @@ public class NavigraphService {
         final JsonNode waypointsNode = navigraphResponse.path("navlog");
         final List<Waypoint> waypoints = new ArrayList<>();
 
-        System.out.println("Waypoints");
+        logger.info("Waypoints");
 
         waypointsNode.path("fix").elements().forEachRemaining(fix -> {
             final String name = fix.path("name").asText();
@@ -113,7 +123,7 @@ public class NavigraphService {
             final double latitude = fix.path("pos_lat").asDouble();
             final double longitude = fix.path("pos_long").asDouble();
 
-            System.out.printf("\t %s, lat: %f, long: %f%n", name, latitude, longitude);
+            logger.info("\t {}, lat: {}, long: {}", name, latitude, longitude);
 
             final Waypoint waypoint = new Waypoint();
             waypoint.setName(name);
@@ -129,7 +139,7 @@ public class NavigraphService {
     }
 
     public NavigraphFlightPlan getFlightPlan() {
-        System.out.println("Started loading Navigraph flight plan");
+        logger.info("Started loading Navigraph flight plan");
         try {
             final boolean useNavigraphApi = settingsDao.useNavigraphConnection();
             final JsonNode root = getRootNode(useNavigraphApi);
@@ -141,7 +151,7 @@ public class NavigraphService {
             setAircraftDetails(root, flightPlan);
             setWaypointDetails(root, flightPlan);
 
-            System.out.println("Finished loading Navigraph flight plan");
+            logger.info("Finished loading Navigraph flight plan");
 
             return flightPlan;
         } catch (IOException e) {

@@ -3,6 +3,8 @@ package com.gav.xplanetracker.dao;
 import com.gav.xplanetracker.database.DatabaseConnection;
 import com.gav.xplanetracker.enums.FlightStatus;
 import com.gav.xplanetracker.model.Flight;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class FlightDaoJDBC {
+
+    private static final Logger logger = LoggerFactory.getLogger(FlightDaoJDBC.class);
 
     private static FlightDaoJDBC INSTANCE;
 
@@ -62,10 +66,10 @@ public class FlightDaoJDBC {
             final int rowsInserted = ps.executeUpdate();
 
             if (rowsInserted == 0) {
-                System.out.println(this.getClass().getName() + ": Nothing inserted - check query config");
+                logger.warn("Nothing inserted - check query config");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error while creating flight: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -107,13 +111,27 @@ public class FlightDaoJDBC {
             }
 
             if (flights.size() > 1) {
-                System.out.println("More than 1 flight returned - look into query");
+                logger.warn("More than 1 flight returned - look into query");
             }
 
             return flights.getFirst();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error while getting flight by status: ", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public void completeFlight(Flight flight) {
+        final String SQL = "UPDATE flight SET status = ? WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.connect()) {
+            final PreparedStatement ps = connection.prepareStatement(SQL);
+            ps.setString(1, FlightStatus.COMPLETED.name());
+            ps.setLong(2, flight.getId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while stopping flight: ", e);
         }
     }
 }
