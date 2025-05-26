@@ -28,6 +28,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Function;
 
 public class FlightController {
 
@@ -299,7 +300,6 @@ public class FlightController {
         }
     }
 
-    //TODO the looping in this method could be more efficient
     private void drawLineGraph(VBox chartContainer, List<FlightEvent> events, FlightEventType eventType) {
         final CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Time");
@@ -319,29 +319,15 @@ public class FlightController {
         if (events != null && !events.isEmpty()) {
             switch (eventType) {
                 case GROUND_SPEED -> {
-                    events.stream()
-                    .filter(FlightEvent::isEnginesRunning)
-                            .forEach(event -> {
-                                final OffsetDateTime odt =
-                                        OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+                    addDataPointToChart(events, series, FlightEvent::getGroundSpeed);
 
-                                series.getData().add(new XYChart.Data<>(time, event.getGroundSpeed()));
-                            });
                     series.setName("Ground Speed");
                     yAxis.setLabel("Ground Speed (Kts)");
                     chart.setTitle("Speed over flight duration");
                 }
                 case DENSITY_ALTITUDE -> {
-                    events.stream()
-                            .filter(FlightEvent::isEnginesRunning)
-                            .forEach(event -> {
-                                final OffsetDateTime odt =
-                                        OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+                    addDataPointToChart(events, series, FlightEvent::getPressureAltitude);
 
-                                series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
-                            });
                     series.setName("Altitude");
                     yAxis.setLabel("Altitude (Ft)");
                     chart.setTitle("Altitude over flight duration");
@@ -360,6 +346,18 @@ public class FlightController {
         chartContainer.prefWidthProperty().bind(mapPanel.prefWidthProperty());
         chartContainer.prefHeightProperty().bind(mapPanel.prefHeightProperty());
         chartContainer.getChildren().add(chart);
+    }
+
+    private void addDataPointToChart(List<FlightEvent> events, XYChart.Series<String, Number> series, Function<FlightEvent, Double> methodToCall) {
+        events.stream()
+        .filter(FlightEvent::isEnginesRunning)
+                .forEach(event -> {
+                    final OffsetDateTime odt =
+                            OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
+                    final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+                    series.getData().add(new XYChart.Data<>(time, methodToCall.apply(event)));
+                });
     }
 
     private void loadFlightData(Flight flight) {
