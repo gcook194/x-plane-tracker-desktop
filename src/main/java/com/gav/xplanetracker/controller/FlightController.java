@@ -142,7 +142,7 @@ public class FlightController {
 
         flightService.getCurrentFlight().ifPresentOrElse(
                 this::activeFlightView,
-                () -> loadMap(false, null)
+                this::noActiveFlightPlanView
         );
     }
 
@@ -225,12 +225,14 @@ public class FlightController {
         }
     }
 
-    private void loadNavigraphMap() {
+    private void loadNavigraphMap(Flight flight) {
         navigraphWebEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
 
         navigraphWebEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 navigraphWebEngine.executeScript("loadMap();");
+
+                if (flight != null) {
                     addMarker(
                             navigraphWebEngine,
                             navigraphFlightPlan.getDeparture().getLatitude(),
@@ -254,8 +256,9 @@ public class FlightController {
                             navigraphFlightPlan.getArrival().getName()
                     );
 
-                navigraphWebEngine.executeScript("drawBasicRouteLine();");
-                navigraphWebEngine.executeScript("fitToAllMarkers();");
+                    navigraphWebEngine.executeScript("drawBasicRouteLine();");
+                    navigraphWebEngine.executeScript("fitToAllMarkers();");
+                }
             }
         });
 
@@ -302,18 +305,21 @@ public class FlightController {
     }
 
     private void loadFlightData(Flight flight) {
-        final List<FlightEvent> events = flightService.getFlightEvents(flight);
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        final XYChart.Series<String, Number> series = new XYChart.Series<>();
 
-        for (FlightEvent event : events) {
-            final OffsetDateTime odt = OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-            String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
-            series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
+        if (flight != null) {
+            final List<FlightEvent> events = flightService.getFlightEvents(flight);
+
+            for (FlightEvent event : events) {
+                final OffsetDateTime odt = OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
+                String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+                series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
+            }
+
+            xAxis.setTickLabelsVisible(false);
+            xAxis.setTickMarkVisible(false);
+            yAxis.setTickMarkVisible(false);
         }
-
-        xAxis.setTickLabelsVisible(false);
-        xAxis.setTickMarkVisible(false);
-        yAxis.setTickMarkVisible(false);
 
         activeFlightDataPanel.prefWidthProperty().bind(mapPanel.prefWidthProperty());
         activeFlightDataPanel.prefHeightProperty().bind(mapPanel.prefHeightProperty());
@@ -353,8 +359,14 @@ public class FlightController {
         );
 
 
-        loadNavigraphMap();
+        loadNavigraphMap(flight);
         loadMap(true, flight);
         loadFlightData(flight);
+    }
+
+    private void noActiveFlightPlanView() {
+        loadMap(false, null);
+        loadNavigraphMap(null);
+        loadFlightData(null);
     }
 }
