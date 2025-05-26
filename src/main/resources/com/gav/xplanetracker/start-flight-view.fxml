@@ -81,19 +81,14 @@
 
                         <Tab text="Active Flight data">
                             <AnchorPane>
-                                <VBox fx:id="activeFlightDataPanel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                    <LineChart fx:id="altitudeChart"
-                                               title="Altitude over Time"
-                                               animated="false"
-                                               legendVisible="false"
-                                               VBox.vgrow="ALWAYS">
-                                        <xAxis>
-                                            <CategoryAxis fx:id="xAxis" label="Time"/>
-                                        </xAxis>
-                                        <yAxis>
-                                            <NumberAxis fx:id="yAxis" label="Altitude (ft)"/>
-                                        </yAxis>
-                                    </LineChart>
+                                <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <VBox fx:id="activeFlightSpeedPanel">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
+
+                                    <VBox fx:id="activeFlightAltitudePanel">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
                                 </VBox>
                             </AnchorPane>
                         </Tab>

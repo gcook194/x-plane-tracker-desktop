@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dto.ApplicationSettingsDTO;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
+import com.gav.xplanetracker.enums.FlightEventType;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.service.FlightService;
@@ -121,16 +122,10 @@ public class FlightController {
     private VBox activeFlightMapPanel;
 
     @FXML
-    private VBox activeFlightDataPanel;
+    private VBox activeFlightAltitudePanel;
 
     @FXML
-    private LineChart<String, Number> altitudeChart;
-
-    @FXML
-    private CategoryAxis xAxis;
-
-    @FXML
-    private NumberAxis yAxis;
+    private VBox activeFlightSpeedPanel;
 
     @FXML
     public void initialize() {
@@ -304,27 +299,69 @@ public class FlightController {
         }
     }
 
-    private void loadFlightData(Flight flight) {
-        final XYChart.Series<String, Number> series = new XYChart.Series<>();
+    private void drawLineGraph(VBox chartContainer, List<FlightEvent> events, FlightEventType eventType) {
+        final CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Time");
 
-        if (flight != null) {
-            final List<FlightEvent> events = flightService.getFlightEvents(flight);
+        final NumberAxis yAxis = new NumberAxis();
 
-            for (FlightEvent event : events) {
+        LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
+        chart.setLegendVisible(false);
+        chart.setCreateSymbols(false);
+        chart.setAnimated(false);
+        chart.setHorizontalGridLinesVisible(false);
+        chart.setVerticalGridLinesVisible(false);
+
+        // Style and background
+        chart.setStyle("-fx-background-color: transparent;");
+
+        // Data series for altitude
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+
+        if (events != null && !events.isEmpty()) {
+            events.forEach(event -> {
                 final OffsetDateTime odt = OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
-                series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
-            }
+                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+                switch (eventType) {
+                    case GROUND_SPEED -> {
+                        logger.info("Adding event for ground speed to chart");
+                        series.getData().add(new XYChart.Data<>(time, event.getGroundSpeed()));
+                        series.setName("Ground Speed");
+                        yAxis.setLabel("Ground Speed (Kts)");
+                        chart.setTitle("Speed over flight duration");
+                    }
+                    case DENSITY_ALTITUDE -> {
+                        logger.info("Adding event for density altitude to chart");
+                        series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
+                        series.setName("Altitude");
+                        yAxis.setLabel("Altitude (Ft)");
+                        chart.setTitle("Altitude over flight duration");
+                    }
+                    default -> throw new IllegalStateException("Event type not supported");
+                }
+            });
 
             xAxis.setTickLabelsVisible(false);
             xAxis.setTickMarkVisible(false);
             yAxis.setTickMarkVisible(false);
         }
 
-        activeFlightDataPanel.prefWidthProperty().bind(mapPanel.prefWidthProperty());
-        activeFlightDataPanel.prefHeightProperty().bind(mapPanel.prefHeightProperty());
-        altitudeChart.getData().clear();
-        altitudeChart.getData().add(series);
+        chart.getData().clear();
+        chart.getData().add(series);
+
+        chartContainer.prefWidthProperty().bind(mapPanel.prefWidthProperty());
+        chartContainer.prefHeightProperty().bind(mapPanel.prefHeightProperty());
+        chartContainer.getChildren().add(chart);
+    }
+
+    private void loadFlightData(Flight flight) {
+        if (flight != null) {
+            final List<FlightEvent> events = flightService.getFlightEvents(flight);
+
+            drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
+            drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
+        }
     }
 
     private void activeFlightView(Flight flight) {
