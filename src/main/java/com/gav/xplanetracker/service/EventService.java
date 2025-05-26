@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
 
 public class EventService {
 
@@ -24,6 +25,9 @@ public class EventService {
     public static final String GROUND_SPEED_DATAREF_NAME = "sim/cockpit2/gauges/indicators/ground_speed_kt";
     public static final String LATITUDE_DATAREF_NAME = "sim/flightmodel/position/latitude";
     public static final String LONGITUDE_DATAREF_NAME = "sim/flightmodel/position/longitude";
+    public static final String HEADING_DATAREF_NAME = "sim/flightmodel/position/mag_psi";
+    public static final String AIRCRAFT_REG_DATAREF_NAME = "sim/aircraft/view/acf_tailnum";
+    public static final String ENGINES_RUNNING_DATAREF_NAME = "sim/flightmodel/engine/ENGN_running";
 
     private static EventService INSTANCE;
 
@@ -53,10 +57,20 @@ public class EventService {
         event.setGroundSpeed(getGroundSpeed(dataRefs));
         event.setLatitude(getLatitude(dataRefs));
         event.setLongitude(getLongitude(dataRefs));
+        event.setHeading(getHeading(dataRefs));
+        event.setEnginesRunning(getEngineStatus(dataRefs));
         event.setCreatedAt(Instant.now());
         event.setFlightId(flight.getId());
 
         flightEventDao.create(event);
+    }
+
+    public String getAircraftRegistration() {
+        logger.info("Fetching aircraft registration from simulator");
+        final XplaneDataRefListDTO dataRefs = getDataRefs();
+
+        // TODO work out how to get this properly from the sim
+        return null;
     }
 
     public XplaneDataRefListDTO getDataRefs() {
@@ -64,7 +78,9 @@ public class EventService {
                 "?filter[name]=" + DENSITY_ALT_DATAREF_NAME +
                 "&filter[name]=" + GROUND_SPEED_DATAREF_NAME +
                 "&filter[name]=" + LATITUDE_DATAREF_NAME +
-                "&filter[name]=" + LONGITUDE_DATAREF_NAME;
+                "&filter[name]=" + LONGITUDE_DATAREF_NAME +
+                "&filter[name]=" + HEADING_DATAREF_NAME +
+                "&filter[name]=" + ENGINES_RUNNING_DATAREF_NAME;
 
         final Request request = new Request.Builder()
                 .url(datarefUri)
@@ -199,6 +215,97 @@ public class EventService {
             throw new RuntimeException("No density altitude returned from simulator API");
         } catch (IOException e) {
             logger.error("Error when fetching longitude: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public double getHeading(XplaneDataRefListDTO dataRefs) {
+        final String longitudeDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(HEADING_DATAREF_NAME))
+                .findAny()
+                .map(XplaneDataRefDTO::getId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        final Request request = new Request.Builder()
+                .url(xPlaneDataRefReqUri(longitudeDataRefId))
+                .build();
+
+        try {
+            final String body = client.newCall(request)
+                    .execute()
+                    .body()
+                    .string();
+            final ObjectMapper mapper = new ObjectMapper();
+            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+
+            if (response != null) {
+                return Double.parseDouble(response.data());
+            }
+
+            throw new RuntimeException("No heading returned from simulator API");
+        } catch (IOException e) {
+            logger.error("Error when fetching tail number: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean getEngineStatus(XplaneDataRefListDTO dataRefs) {
+        final String enginesRunningDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(ENGINES_RUNNING_DATAREF_NAME))
+                .findAny()
+                .map(XplaneDataRefDTO::getId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        final Request request = new Request.Builder()
+                .url(xPlaneDataRefReqUri(enginesRunningDataRefId))
+                .build();
+
+        try {
+            final String body = client.newCall(request)
+                    .execute()
+                    .body()
+                    .string();
+            final ObjectMapper mapper = new ObjectMapper();
+            final XplaneApiListResponse response = mapper.readValue(body, XplaneApiListResponse.class);
+
+            if (response != null) {
+                return Arrays.stream(response.data())
+                        .anyMatch(number -> number == 1);
+            }
+
+            throw new RuntimeException("No heading returned from simulator API");
+        } catch (IOException e) {
+            logger.error("Error when fetching tail number: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getAircraftReg(XplaneDataRefListDTO dataRefs) {
+        final String registrationDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(AIRCRAFT_REG_DATAREF_NAME))
+                .findAny()
+                .map(XplaneDataRefDTO::getId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        final Request request = new Request.Builder()
+                .url(xPlaneDataRefReqUri(registrationDataRefId))
+                .build();
+
+        try {
+            final String body = client.newCall(request)
+                    .execute()
+                    .body()
+                    .string();
+            final ObjectMapper mapper = new ObjectMapper();
+            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+
+            if (response != null) {
+                return response.data();
+            }
+
+            return "";
+        } catch (IOException e) {
+            logger.error("Error when fetching tail number: ", e);
             throw new RuntimeException(e);
         }
     }

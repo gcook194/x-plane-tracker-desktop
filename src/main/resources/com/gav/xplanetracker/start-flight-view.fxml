@@ -2,9 +2,6 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.gav.xplanetracker.controller.FlightController">
 
     <center>
@@ -66,7 +63,7 @@
                         <Tab text="Navigraph Flight Plan">
                             <AnchorPane>
                                 <VBox fx:id="navigraphMapPanel">
-                                    <!-- populated with javascript -->
+                                    <!-- populated with web view -->
                                 </VBox>
                             </AnchorPane>
                         </Tab>
@@ -74,7 +71,7 @@
                         <Tab text="Active Flight Progress">
                             <AnchorPane>
                                 <VBox fx:id="activeFlightMapPanel">
-                                    <!-- populated with javascript -->
+                                    <!-- populated with web view -->
                                 </VBox>
                             </AnchorPane>
                         </Tab>

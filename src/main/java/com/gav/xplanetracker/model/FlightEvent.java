@@ -12,6 +12,8 @@ public class FlightEvent {
     private double longitude;
     private double groundSpeed;
     private long flightId;
+    private double heading;
+    private boolean enginesRunning;
 
     public FlightEvent() {}
 
@@ -71,15 +73,31 @@ public class FlightEvent {
         this.flightId = flightId;
     }
 
+    public double getHeading() {
+        return heading;
+    }
+
+    public void setHeading(double heading) {
+        this.heading = heading;
+    }
+
+    public boolean isEnginesRunning() {
+        return enginesRunning;
+    }
+
+    public void setEnginesRunning(boolean enginesRunning) {
+        this.enginesRunning = enginesRunning;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         FlightEvent that = (FlightEvent) o;
-        return id == that.id && Double.compare(pressureAltitude, that.pressureAltitude) == 0 && Double.compare(latitude, that.latitude) == 0 && Double.compare(longitude, that.longitude) == 0 && Double.compare(groundSpeed, that.groundSpeed) == 0 && Objects.equals(createdAt, that.createdAt);
+        return id == that.id && Double.compare(pressureAltitude, that.pressureAltitude) == 0 && Double.compare(latitude, that.latitude) == 0 && Double.compare(longitude, that.longitude) == 0 && Double.compare(groundSpeed, that.groundSpeed) == 0 && flightId == that.flightId && Double.compare(heading, that.heading) == 0 && enginesRunning == that.enginesRunning && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdAt, pressureAltitude, latitude, longitude, groundSpeed);
+        return Objects.hash(id, createdAt, pressureAltitude, latitude, longitude, groundSpeed, flightId, heading, enginesRunning);
     }
 }

@@ -7,10 +7,7 @@ import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightEventType;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
-import com.gav.xplanetracker.service.FlightService;
-import com.gav.xplanetracker.service.NavigraphService;
-import com.gav.xplanetracker.service.SettingsService;
-import com.gav.xplanetracker.service.XPlaneService;
+import com.gav.xplanetracker.service.*;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
@@ -40,6 +37,7 @@ public class FlightController {
     private final NavigraphService navigraphService;
     private final XPlaneService xPlaneService;
     private final SettingsService settingsService;
+    private final EventService eventService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
@@ -53,6 +51,7 @@ public class FlightController {
         this.navigraphService = NavigraphService.getInstance();
         this.xPlaneService = XPlaneService.getInstance();
         this.settingsService = SettingsService.getInstance();
+        this.eventService = EventService.getInstance();
 
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
@@ -149,7 +148,8 @@ public class FlightController {
         final Task<Flight> loadFlightDataTask = new Task<>() {
             @Override
             protected Flight call() {
-                return flightService.getOrCreateCurrentFlight(navigraphFlightPlan);
+                final String aircraftReg = eventService.getAircraftRegistration();
+                return flightService.getOrCreateCurrentFlight(navigraphFlightPlan, aircraftReg);
             }
 
             @Override
@@ -299,40 +299,40 @@ public class FlightController {
         }
     }
 
+    //TODO the looping in this method could be more efficient
     private void drawLineGraph(VBox chartContainer, List<FlightEvent> events, FlightEventType eventType) {
         final CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Time");
 
         final NumberAxis yAxis = new NumberAxis();
 
-        LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
+        final LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
         chart.setLegendVisible(false);
         chart.setCreateSymbols(false);
         chart.setAnimated(false);
         chart.setHorizontalGridLinesVisible(false);
         chart.setVerticalGridLinesVisible(false);
-
-        // Style and background
         chart.setStyle("-fx-background-color: transparent;");
 
-        // Data series for altitude
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        final XYChart.Series<String, Number> series = new XYChart.Series<>();
 
         if (events != null && !events.isEmpty()) {
-            events.forEach(event -> {
+            events.stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .forEach(event -> {
                 final OffsetDateTime odt = OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
                 final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
 
                 switch (eventType) {
                     case GROUND_SPEED -> {
-                        logger.info("Adding event for ground speed to chart");
+                        logger.debug("Adding event for ground speed to chart");
                         series.getData().add(new XYChart.Data<>(time, event.getGroundSpeed()));
                         series.setName("Ground Speed");
                         yAxis.setLabel("Ground Speed (Kts)");
                         chart.setTitle("Speed over flight duration");
                     }
                     case DENSITY_ALTITUDE -> {
-                        logger.info("Adding event for density altitude to chart");
+                        logger.debug("Adding event for density altitude to chart");
                         series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
                         series.setName("Altitude");
                         yAxis.setLabel("Altitude (Ft)");

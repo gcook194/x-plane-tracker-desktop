@@ -33,7 +33,7 @@ public class XPlaneService {
                 .build();
 
         try (ResponseBody body = client.newCall(request).execute().body()) {
-            logger.info(body.string());
+            body.string();
         } catch (IOException e) {
             logger.warn("Simulator is not running or may be exposing a different port - check X-Plane settings");
             return false;

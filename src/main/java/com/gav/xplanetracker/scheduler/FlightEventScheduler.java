@@ -55,7 +55,7 @@ public class FlightEventScheduler {
             } catch (Exception e) {
                 logger.error("Error when executing scheduled task: ", e);
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, 30, TimeUnit.SECONDS);
     }
 
     public void stopFetching() {
