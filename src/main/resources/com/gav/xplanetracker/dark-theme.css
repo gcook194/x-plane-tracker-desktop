@@ -169,7 +169,6 @@
     -fx-text-fill: #bbbbbb;
 }
 
-/* Override background of each tab's content */
 .tab {
     -fx-background-insets: 0;
 }
@@ -181,5 +180,35 @@
 .tab-content-area, .tab {
     -fx-background-color: #252525;
 }
+
+.chart {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: white;
+}
+
+.chart-title, .chart-legend, .axis-label, .axis {
+    -fx-text-fill: white;
+}
+
+.chart-series-line {
+    -fx-stroke: #3498db; /* Blue line */
+    -fx-stroke-width: 2px;
+}
+
+.chart-plot-background {
+    -fx-background-color: #2a2a2a;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: #444444;
+}
+
+.chart-line-symbol {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+
 
 ``

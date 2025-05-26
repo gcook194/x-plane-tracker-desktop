@@ -13,6 +13,10 @@ import com.gav.xplanetracker.service.XPlaneService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -22,6 +26,9 @@ import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FlightController {
@@ -112,6 +119,18 @@ public class FlightController {
 
     @FXML
     private VBox activeFlightMapPanel;
+
+    @FXML
+    private VBox activeFlightDataPanel;
+
+    @FXML
+    private LineChart<String, Number> altitudeChart;
+
+    @FXML
+    private CategoryAxis xAxis;
+
+    @FXML
+    private NumberAxis yAxis;
 
     @FXML
     public void initialize() {
@@ -282,6 +301,26 @@ public class FlightController {
         }
     }
 
+    private void loadFlightData(Flight flight) {
+        final List<FlightEvent> events = flightService.getFlightEvents(flight);
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+
+        for (FlightEvent event : events) {
+            final OffsetDateTime odt = OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
+            String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+            series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
+        }
+
+        xAxis.setTickLabelsVisible(false);
+        xAxis.setTickMarkVisible(false);
+        yAxis.setTickMarkVisible(false);
+
+        activeFlightDataPanel.prefWidthProperty().bind(mapPanel.prefWidthProperty());
+        activeFlightDataPanel.prefHeightProperty().bind(mapPanel.prefHeightProperty());
+        altitudeChart.getData().clear();
+        altitudeChart.getData().add(series);
+    }
+
     private void activeFlightView(Flight flight) {
         loadingBox.setVisible(false);
         loadingBox.setManaged(false);
@@ -316,5 +355,6 @@ public class FlightController {
 
         loadNavigraphMap();
         loadMap(true, flight);
+        loadFlightData(flight);
     }
 }

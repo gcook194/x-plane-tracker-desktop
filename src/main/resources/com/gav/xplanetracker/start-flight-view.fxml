@@ -2,6 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.gav.xplanetracker.controller.FlightController">
 
     <center>
@@ -60,22 +63,40 @@
 
                 <VBox fx:id="mapPanel" styleClass="map-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns:fx="http://javafx.com/fxml">
                     <TabPane fx:id="mapTabPane" tabClosingPolicy="UNAVAILABLE" style="-fx-background-color: red;">
-                            <Tab text="Navigraph Flight Plan">
-                                <!-- You can put a WebView or other layout here -->
-                                <AnchorPane>
-                                    <VBox fx:id="navigraphMapPanel">
-                                        <!-- populated with javascript -->
-                                    </VBox>
-                                </AnchorPane>
-                            </Tab>
+                        <Tab text="Navigraph Flight Plan">
+                            <AnchorPane>
+                                <VBox fx:id="navigraphMapPanel">
+                                    <!-- populated with javascript -->
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
 
-                            <Tab text="Active Flight Progress">
-                                <AnchorPane>
-                                    <VBox fx:id="activeFlightMapPanel">
-                                        <!-- populated with javascript -->
-                                    </VBox>
-                                </AnchorPane>
-                            </Tab>
+                        <Tab text="Active Flight Progress">
+                            <AnchorPane>
+                                <VBox fx:id="activeFlightMapPanel">
+                                    <!-- populated with javascript -->
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+
+                        <Tab text="Active Flight data">
+                            <AnchorPane>
+                                <VBox fx:id="activeFlightDataPanel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <LineChart fx:id="altitudeChart"
+                                               title="Altitude over Time"
+                                               animated="false"
+                                               legendVisible="false"
+                                               VBox.vgrow="ALWAYS">
+                                        <xAxis>
+                                            <CategoryAxis fx:id="xAxis" label="Time"/>
+                                        </xAxis>
+                                        <yAxis>
+                                            <NumberAxis fx:id="yAxis" label="Altitude (ft)"/>
+                                        </yAxis>
+                                    </LineChart>
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
                     </TabPane>
 
                 </VBox>
