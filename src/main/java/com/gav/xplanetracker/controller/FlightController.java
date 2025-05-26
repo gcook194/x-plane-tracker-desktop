@@ -325,14 +325,12 @@ public class FlightController {
 
                 switch (eventType) {
                     case GROUND_SPEED -> {
-                        logger.debug("Adding event for ground speed to chart");
                         series.getData().add(new XYChart.Data<>(time, event.getGroundSpeed()));
                         series.setName("Ground Speed");
                         yAxis.setLabel("Ground Speed (Kts)");
                         chart.setTitle("Speed over flight duration");
                     }
                     case DENSITY_ALTITUDE -> {
-                        logger.debug("Adding event for density altitude to chart");
                         series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
                         series.setName("Altitude");
                         yAxis.setLabel("Altitude (Ft)");
