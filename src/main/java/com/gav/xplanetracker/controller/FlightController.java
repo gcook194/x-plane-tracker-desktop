@@ -317,28 +317,37 @@ public class FlightController {
         final XYChart.Series<String, Number> series = new XYChart.Series<>();
 
         if (events != null && !events.isEmpty()) {
-            events.stream()
-                .filter(FlightEvent::isEnginesRunning)
-                .forEach(event -> {
-                final OffsetDateTime odt = OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+            switch (eventType) {
+                case GROUND_SPEED -> {
+                    events.stream()
+                    .filter(FlightEvent::isEnginesRunning)
+                            .forEach(event -> {
+                                final OffsetDateTime odt =
+                                        OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
+                                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
 
-                switch (eventType) {
-                    case GROUND_SPEED -> {
-                        series.getData().add(new XYChart.Data<>(time, event.getGroundSpeed()));
-                        series.setName("Ground Speed");
-                        yAxis.setLabel("Ground Speed (Kts)");
-                        chart.setTitle("Speed over flight duration");
-                    }
-                    case DENSITY_ALTITUDE -> {
-                        series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
-                        series.setName("Altitude");
-                        yAxis.setLabel("Altitude (Ft)");
-                        chart.setTitle("Altitude over flight duration");
-                    }
-                    default -> throw new IllegalStateException("Event type not supported");
+                                series.getData().add(new XYChart.Data<>(time, event.getGroundSpeed()));
+                            });
+                    series.setName("Ground Speed");
+                    yAxis.setLabel("Ground Speed (Kts)");
+                    chart.setTitle("Speed over flight duration");
                 }
-            });
+                case DENSITY_ALTITUDE -> {
+                    events.stream()
+                            .filter(FlightEvent::isEnginesRunning)
+                            .forEach(event -> {
+                                final OffsetDateTime odt =
+                                        OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
+                                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+                                series.getData().add(new XYChart.Data<>(time, event.getPressureAltitude()));
+                            });
+                    series.setName("Altitude");
+                    yAxis.setLabel("Altitude (Ft)");
+                    chart.setTitle("Altitude over flight duration");
+                }
+                default -> throw new IllegalStateException("Event type not supported");
+            }
 
             xAxis.setTickLabelsVisible(false);
             xAxis.setTickMarkVisible(false);
