@@ -382,11 +382,11 @@ public class FlightController {
     }
 
     private void loadFlightData(Flight flight) {
+        activeFlightAltitudePanel.getChildren().clear();
+        activeFlightSpeedPanel.getChildren().clear();
+
         if (flight != null) {
             final List<FlightEvent> events = flightService.getFlightEvents(flight);
-
-            activeFlightAltitudePanel.getChildren().clear();
-            activeFlightSpeedPanel.getChildren().clear();
 
             drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
             drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
