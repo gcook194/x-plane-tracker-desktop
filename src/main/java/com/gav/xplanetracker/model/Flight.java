@@ -22,6 +22,7 @@ public class Flight {
     private Instant cancelledAt;
     private String aircraftTypeIcao;
     private String aircraftReg;
+    private String navigraphJson;
 
     private List<FlightEvent> events;
 
@@ -123,6 +124,14 @@ public class Flight {
 
     public void setAircraftReg(String aircraftReg) {
         this.aircraftReg = aircraftReg;
+    }
+
+    public String getNavigraphJson() {
+        return navigraphJson;
+    }
+
+    public void setNavigraphJson(String navigraphJson) {
+        this.navigraphJson = navigraphJson;
     }
 
     public List<FlightEvent> getEvents() {

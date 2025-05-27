@@ -178,14 +178,14 @@ public class FlightController {
 
     @FXML
     private void onActiveFlightProgressTabSelected() {
-        logger.info("refreshing active flight progress tab");
+        logger.debug("refreshing active flight progress tab");
         flightService.getActiveFlight()
                 .ifPresent(flight -> loadMap(true, flight));
     }
 
     @FXML
     private void onActiveFlightDataTabSelected() {
-        logger.info("refreshing active flight data graphs");
+        logger.debug("refreshing active flight data graphs");
         flightService.getActiveFlight()
                 .ifPresent(this::loadFlightData);
     }

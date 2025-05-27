@@ -38,7 +38,8 @@ public class FlightDaoJDBC {
                 "    arrival_airport_icao,\n" +
                 "    departure_airport_icao,\n" +
                 "    flight_number_icao,\n" +
-                "    status\n" +
+                "    status, \n" +
+                "    navigraph_json \n" +
                 ") VALUES (\n" +
                 "    ?, -- created_at\n" +
                 "    ?, -- started_at\n" +
@@ -48,7 +49,8 @@ public class FlightDaoJDBC {
                 "    ?, -- arrival_airport_icao\n" +
                 "    ?, -- departure_airport_icao\n" +
                 "    ?, -- flight_number_icao\n" +
-                "    ?  -- status\n" +
+                "    ?, -- status\n" +
+                "    ?  -- navigraph flight plan json\n" +
                 ")";
 
         try (Connection connection = DatabaseConnection.connect()) {
@@ -62,6 +64,7 @@ public class FlightDaoJDBC {
             ps.setString(7, flight.getDepartureAirportIcao());
             ps.setString(8, flight.getFlightNumberIcao());
             ps.setString(9, flight.getStatus().toString());
+            ps.setString(10, flight.getNavigraphJson());
 
             final int rowsInserted = ps.executeUpdate();
 
@@ -102,6 +105,7 @@ public class FlightDaoJDBC {
                 flight.setDepartureAirportIcao(rs.getString("departure_airport_icao"));
                 flight.setArrivalAirportIcao(rs.getString("arrival_airport_icao"));
                 flight.setStatus(FlightStatus.IN_PROGRESS); // TODO update enum to get name by string
+                flight.setNavigraphJson(rs.getString("navigraph_json"));
 
                 flights.add(flight);
             }

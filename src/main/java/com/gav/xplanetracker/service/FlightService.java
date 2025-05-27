@@ -1,5 +1,7 @@
 package com.gav.xplanetracker.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dao.FlightDaoJDBC;
 import com.gav.xplanetracker.dao.FlightEventDaoJDBC;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
@@ -56,6 +58,9 @@ public class FlightService {
         flight.setUserId(UUID.randomUUID()); //TODO eventually needs to be a real value
         flight.setAircraftReg(navigraphFlightPlan.getAircraftRegistration());
 
+        final String navigraphJson = getNavigraphFlightPlanAsString(navigraphFlightPlan);
+        flight.setNavigraphJson(navigraphJson);
+
         flightDao.create(flight);
 
         // TODO send message to aws
@@ -77,5 +82,18 @@ public class FlightService {
 
     public List<FlightEvent> getFlightEvents(Flight flight) {
         return flightEventDao.getFlightEvents(flight);
+    }
+
+    public String getNavigraphFlightPlanAsString(NavigraphFlightPlan flightPlan) {
+        try {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final String flightPlanAsString = objectMapper.writeValueAsString(flightPlan);
+            logger.debug(flightPlanAsString);
+
+            return flightPlanAsString;
+        } catch (JsonProcessingException e) {
+            logger.error("Error parsing navigraph flight plan as string: ", e);
+            throw new RuntimeException(e);
+        }
     }
 }

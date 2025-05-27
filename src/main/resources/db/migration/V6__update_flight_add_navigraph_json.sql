@@ -1,0 +1,1 @@
+ALTER TABLE flight ADD navigraph_json TEXT;
