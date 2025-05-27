@@ -78,12 +78,21 @@
 
                         <Tab text="Active Flight data">
                             <AnchorPane>
-                                <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                    <VBox fx:id="activeFlightSpeedPanel">
+                                <VBox fx:id="chartsContainer"
+                                      AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                      spacing="10">
+                                    <VBox fx:id="activeFlightSpeedPanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
                                         <!-- chart generated in back end -->
                                     </VBox>
 
-                                    <VBox fx:id="activeFlightAltitudePanel">
+                                    <VBox fx:id="activeFlightAltitudePanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
                                         <!-- chart generated in back end -->
                                     </VBox>
                                 </VBox>
