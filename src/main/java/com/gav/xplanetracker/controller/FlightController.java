@@ -130,12 +130,15 @@ public class FlightController {
     @FXML
     public void initialize() {
         handleSimulatorState();
-        navigraphFlightPlan = navigraphService.getFlightPlan();
+
+        if (navigraphFlightPlan != null) {
+            navigraphFlightPlan = navigraphService.getFlightPlan();
+        }
 
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
-        flightService.getCurrentFlight().ifPresentOrElse(
+        flightService.getActiveFlight().ifPresentOrElse(
                 this::activeFlightView,
                 this::noActiveFlightPlanView
         );
@@ -183,7 +186,7 @@ public class FlightController {
         startFlight.setVisible(true);
         startFlight.setManaged(true);
 
-        loadMap(false, null);
+        noActiveFlightPlanView();
     }
 
     // TODO move to service layer
@@ -195,8 +198,7 @@ public class FlightController {
 
         final ObjectMapper mapper = new ObjectMapper();
         try {
-            label = mapper.writeValueAsString(label);
-            final String script = String.format("addMarkerToMap(%f, %f, %s);", latitude, longitude, label);
+            final String script = String.format("addMarkerToMap(%f, %f, %s);", latitude, longitude, mapper.writeValueAsString(label));
             webEngine.executeScript(script);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

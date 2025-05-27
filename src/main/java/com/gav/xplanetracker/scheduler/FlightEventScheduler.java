@@ -47,7 +47,7 @@ public class FlightEventScheduler {
                     return;
                 }
 
-                flightService.getCurrentFlight().ifPresentOrElse(
+                flightService.getActiveFlight().ifPresentOrElse(
                         eventService::create,
                         () -> logger.info("No flights in progress - no events created")
                 );

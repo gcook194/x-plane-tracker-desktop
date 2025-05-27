@@ -36,7 +36,7 @@ public class FlightService {
     }
 
     public Flight getOrCreateCurrentFlight(final NavigraphFlightPlan navigraphFlightPlan, final String aircraftReg) {
-        return getCurrentFlight()
+        return getActiveFlight()
                 .orElseGet(() -> startFlight(navigraphFlightPlan, aircraftReg));
     }
 
@@ -69,12 +69,12 @@ public class FlightService {
         return flight;
     }
 
-    public Optional<Flight> getCurrentFlight() {
+    public Optional<Flight> getActiveFlight() {
         return Optional.ofNullable(flightDao.getFlightByStatus(FlightStatus.IN_PROGRESS));
     }
 
     public void completeActiveFlight() {
-        getCurrentFlight().ifPresent(this::completeFlight);
+        getActiveFlight().ifPresent(this::completeFlight);
     }
 
     private void completeFlight(Flight flight) {
