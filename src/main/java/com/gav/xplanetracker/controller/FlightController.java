@@ -356,14 +356,14 @@ public class FlightController {
 
     private void addDataPointToChart(List<FlightEvent> events, XYChart.Series<String, Number> series, Function<FlightEvent, Double> methodToCall) {
         events.stream()
-        .filter(FlightEvent::isEnginesRunning)
-                .forEach(event -> {
-                    final OffsetDateTime odt =
-                            OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                    final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
+            .filter(FlightEvent::isEnginesRunning)
+            .forEach(event -> {
+                final OffsetDateTime odt =
+                        OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
+                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
 
-                    series.getData().add(new XYChart.Data<>(time, methodToCall.apply(event)));
-                });
+                series.getData().add(new XYChart.Data<>(time, methodToCall.apply(event)));
+            });
     }
 
     private void loadFlightData(Flight flight) {
