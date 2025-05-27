@@ -68,7 +68,7 @@
                             </AnchorPane>
                         </Tab>
 
-                        <Tab text="Active Flight Progress">
+                        <Tab text="Active Flight Progress" onSelectionChanged="#onActiveFlightProgressTabSelected">
                             <AnchorPane>
                                 <VBox fx:id="activeFlightMapPanel">
                                     <!-- populated with web view -->
@@ -76,7 +76,7 @@
                             </AnchorPane>
                         </Tab>
 
-                        <Tab text="Active Flight data">
+                        <Tab text="Active Flight data" onSelectionChanged="#onActiveFlightDataTabSelected">
                             <AnchorPane>
                                 <VBox fx:id="chartsContainer"
                                       AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
@@ -99,9 +99,7 @@
                             </AnchorPane>
                         </Tab>
                     </TabPane>
-
                 </VBox>
-
             </HBox>
         </StackPane>
     </center>

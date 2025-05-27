@@ -122,12 +122,13 @@ public class FlightDaoJDBC {
     }
 
     public void completeFlight(Flight flight) {
-        final String SQL = "UPDATE flight SET status = ? WHERE id = ?";
+        final String SQL = "UPDATE flight SET status = ?, completed_at = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.connect()) {
             final PreparedStatement ps = connection.prepareStatement(SQL);
             ps.setString(1, FlightStatus.COMPLETED.name());
-            ps.setLong(2, flight.getId());
+            ps.setString(2, Instant.now().toString());
+            ps.setLong(3, flight.getId());
 
             ps.executeUpdate();
         } catch (SQLException e) {

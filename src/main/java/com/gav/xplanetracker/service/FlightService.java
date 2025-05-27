@@ -35,12 +35,12 @@ public class FlightService {
         this.flightEventDao = FlightEventDaoJDBC.getInstance();
     }
 
-    public Flight getOrCreateCurrentFlight(final NavigraphFlightPlan navigraphFlightPlan, final String aircraftReg) {
+    public Flight getOrCreateCurrentFlight(final NavigraphFlightPlan navigraphFlightPlan) {
         return getActiveFlight()
-                .orElseGet(() -> startFlight(navigraphFlightPlan, aircraftReg));
+                .orElseGet(() -> startFlight(navigraphFlightPlan));
     }
 
-    public Flight startFlight(final NavigraphFlightPlan navigraphFlightPlan, String aircraftReg) {
+    public Flight startFlight(final NavigraphFlightPlan navigraphFlightPlan) {
         logger.info("Starting flight");
 
         // TODO look at lombok, mapstruct or create a builder class
@@ -54,13 +54,7 @@ public class FlightService {
         flight.setStartedAt(Instant.now());
         flight.setStatus(FlightStatus.IN_PROGRESS);
         flight.setUserId(UUID.randomUUID()); //TODO eventually needs to be a real value
-
-        if (aircraftReg != null) {
-            flight.setAircraftReg(aircraftReg);
-        } else {
-            // This is a fallback and isn't necessarily reliable because I am lazy
-            flight.setAircraftReg(navigraphFlightPlan.getAircraftRegistration());
-        }
+        flight.setAircraftReg(navigraphFlightPlan.getAircraftRegistration());
 
         flightDao.create(flight);
 

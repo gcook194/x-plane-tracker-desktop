@@ -38,7 +38,6 @@ public class FlightController {
     private final NavigraphService navigraphService;
     private final XPlaneService xPlaneService;
     private final SettingsService settingsService;
-    private final EventService eventService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
@@ -52,7 +51,6 @@ public class FlightController {
         this.navigraphService = NavigraphService.getInstance();
         this.xPlaneService = XPlaneService.getInstance();
         this.settingsService = SettingsService.getInstance();
-        this.eventService = EventService.getInstance();
 
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
@@ -131,16 +129,14 @@ public class FlightController {
     public void initialize() {
         handleSimulatorState();
 
-        if (navigraphFlightPlan != null) {
-            navigraphFlightPlan = navigraphService.getFlightPlan();
-        }
+        navigraphFlightPlan = navigraphService.getFlightPlan();
 
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
         flightService.getActiveFlight().ifPresentOrElse(
                 this::activeFlightView,
-                this::noActiveFlightPlanView
+                this::noActiveFlightView
         );
     }
 
@@ -152,8 +148,7 @@ public class FlightController {
         final Task<Flight> loadFlightDataTask = new Task<>() {
             @Override
             protected Flight call() {
-                final String aircraftReg = eventService.getAircraftRegistration();
-                return flightService.getOrCreateCurrentFlight(navigraphFlightPlan, aircraftReg);
+                return flightService.getOrCreateCurrentFlight(navigraphFlightPlan);
             }
 
             @Override
@@ -186,18 +181,30 @@ public class FlightController {
         startFlight.setVisible(true);
         startFlight.setManaged(true);
 
-        noActiveFlightPlanView();
+        noActiveFlightView();
+    }
+
+    @FXML
+    private void onActiveFlightProgressTabSelected() {
+        logger.info("refreshing active flight progress tab");
+        flightService.getActiveFlight()
+                .ifPresent(flight -> loadMap(true, flight));
+    }
+
+    @FXML
+    private void onActiveFlightDataTabSelected() {
+        logger.info("refreshing active flight data graphs");
+        flightService.getActiveFlight()
+                .ifPresent(this::loadFlightData);
     }
 
     // TODO move to service layer
     private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
-        // fixes issue where negative longitudes always display to the east on the map
-        if (longitude < 0) {
-            longitude += 360;
-        }
+        // drawing lines between waypoints breaks if longitude is negative
+        longitude += 360;
 
-        final ObjectMapper mapper = new ObjectMapper();
         try {
+            final ObjectMapper mapper = new ObjectMapper();
             final String script = String.format("addMarkerToMap(%f, %f, %s);", latitude, longitude, mapper.writeValueAsString(label));
             webEngine.executeScript(script);
         } catch (JsonProcessingException e) {
@@ -218,7 +225,11 @@ public class FlightController {
                 })
                 .toList();
 
-        final double heading = events.getLast().getHeading();
+        double heading = 360d;
+
+        if (!events.isEmpty()) {
+            heading = events.getLast().getHeading();
+        }
 
         if (!latLongs.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();
@@ -374,6 +385,9 @@ public class FlightController {
         if (flight != null) {
             final List<FlightEvent> events = flightService.getFlightEvents(flight);
 
+            activeFlightAltitudePanel.getChildren().clear();
+            activeFlightSpeedPanel.getChildren().clear();
+
             drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
             drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
         }
@@ -416,7 +430,7 @@ public class FlightController {
         loadFlightData(flight);
     }
 
-    private void noActiveFlightPlanView() {
+    private void noActiveFlightView() {
         loadMap(false, null);
         loadNavigraphMap(null);
         loadFlightData(null);
