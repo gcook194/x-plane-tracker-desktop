@@ -193,8 +193,14 @@ public class FlightController {
             longitude += 360;
         }
 
-        String script = String.format("addMarkerToMap(%f, %f, '%s');", latitude, longitude, label);
-        webEngine.executeScript(script);
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            label = mapper.writeValueAsString(label);
+            final String script = String.format("addMarkerToMap(%f, %f, %s);", latitude, longitude, label);
+            webEngine.executeScript(script);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // TODO move to service layer
