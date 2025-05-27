@@ -1,7 +1,5 @@
 package com.gav.xplanetracker.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dto.ApplicationSettingsDTO;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightEventType;
@@ -11,10 +9,6 @@ import com.gav.xplanetracker.service.*;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -24,11 +18,7 @@ import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.function.Function;
 
 public class FlightController {
 
@@ -38,6 +28,7 @@ public class FlightController {
     private final NavigraphService navigraphService;
     private final XPlaneService xPlaneService;
     private final SettingsService settingsService;
+    private final MapService mapService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
@@ -51,6 +42,7 @@ public class FlightController {
         this.navigraphService = NavigraphService.getInstance();
         this.xPlaneService = XPlaneService.getInstance();
         this.settingsService = SettingsService.getInstance();
+        this.mapService = MapService.getInstance();
 
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
@@ -198,50 +190,6 @@ public class FlightController {
                 .ifPresent(this::loadFlightData);
     }
 
-    // TODO move to service layer
-    private void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
-        // drawing lines between waypoints breaks if longitude is negative
-        longitude += 360;
-
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            final String script = String.format("addMarkerToMap(%f, %f, %s);", latitude, longitude, mapper.writeValueAsString(label));
-            webEngine.executeScript(script);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // TODO move to service layer
-    private void drawActualRoute(Flight flight) {
-        final List<FlightEvent> events = flightService.getFlightEvents(flight);
-        final List<double[]> latLongs = events.stream()
-                .map(event -> {
-                    final double[] latLong = new double[2];
-                    latLong[0] = event.getLatitude();
-                    latLong[1] = event.getLongitude();
-
-                    return latLong;
-                })
-                .toList();
-
-        double heading = 360d;
-
-        if (!events.isEmpty()) {
-            heading = events.getLast().getHeading();
-        }
-
-        if (!latLongs.isEmpty()) {
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                String jsonLatLongs = mapper.writeValueAsString(latLongs);
-                webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs  +"," + heading + ");");
-            } catch (JsonProcessingException e) {
-                logger.error("Could not parse latLong data to JSON", e);
-            }
-        }
-    }
-
     private void loadNavigraphMap(Flight flight) {
         navigraphWebEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
 
@@ -250,7 +198,7 @@ public class FlightController {
                 navigraphWebEngine.executeScript("loadMap();");
 
                 if (flight != null) {
-                    addMarker(
+                    mapService.addMarker(
                             navigraphWebEngine,
                             navigraphFlightPlan.getDeparture().getLatitude(),
                             navigraphFlightPlan.getDeparture().getLongitude(),
@@ -258,7 +206,7 @@ public class FlightController {
                     );
 
                     navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
-                        addMarker(
+                        mapService.addMarker(
                                 navigraphWebEngine,
                                 waypoint.getLatitude(),
                                 waypoint.getLongitude(),
@@ -266,7 +214,7 @@ public class FlightController {
                         );
                     });
 
-                    addMarker(
+                    mapService.addMarker(
                             navigraphWebEngine,
                             navigraphFlightPlan.getArrival().getLatitude(),
                             navigraphFlightPlan.getArrival().getLongitude(),
@@ -293,7 +241,8 @@ public class FlightController {
             if (newState == Worker.State.SUCCEEDED) {
                 webEngine.executeScript("loadMap();");
                 if (drawFlightDetails) {
-                    drawActualRoute(flight);
+                    final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
+                    mapService.drawActualRoute(webEngine, flightEvents);
                 }
             }
         });
@@ -321,66 +270,6 @@ public class FlightController {
         }
     }
 
-    private void drawLineGraph(VBox chartContainer, List<FlightEvent> events, FlightEventType eventType) {
-        final CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Time");
-
-        final NumberAxis yAxis = new NumberAxis();
-
-        final LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setLegendVisible(false);
-        chart.setCreateSymbols(false);
-        chart.setAnimated(false);
-        chart.setHorizontalGridLinesVisible(false);
-        chart.setVerticalGridLinesVisible(false);
-        chart.setStyle("-fx-background-color: transparent;");
-
-        final XYChart.Series<String, Number> series = new XYChart.Series<>();
-
-        if (events != null && !events.isEmpty()) {
-            switch (eventType) {
-                case GROUND_SPEED -> {
-                    addDataPointToChart(events, series, FlightEvent::getGroundSpeed);
-
-                    series.setName("Ground Speed");
-                    yAxis.setLabel("Ground Speed (Kts)");
-                    chart.setTitle("Speed over flight duration");
-                }
-                case DENSITY_ALTITUDE -> {
-                    addDataPointToChart(events, series, FlightEvent::getPressureAltitude);
-
-                    series.setName("Altitude");
-                    yAxis.setLabel("Altitude (Ft)");
-                    chart.setTitle("Altitude over flight duration");
-                }
-                default -> throw new IllegalStateException("Event type not supported");
-            }
-
-            xAxis.setTickLabelsVisible(false);
-            xAxis.setTickMarkVisible(false);
-            yAxis.setTickMarkVisible(false);
-        }
-
-        chart.getData().clear();
-        chart.getData().add(series);
-
-        chartContainer.prefWidthProperty().bind(mapPanel.prefWidthProperty());
-        chartContainer.prefHeightProperty().bind(mapPanel.prefHeightProperty());
-        chartContainer.getChildren().add(chart);
-    }
-
-    private void addDataPointToChart(List<FlightEvent> events, XYChart.Series<String, Number> series, Function<FlightEvent, Double> methodToCall) {
-        events.stream()
-            .filter(FlightEvent::isEnginesRunning)
-            .forEach(event -> {
-                final OffsetDateTime odt =
-                        OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
-
-                series.getData().add(new XYChart.Data<>(time, methodToCall.apply(event)));
-            });
-    }
-
     private void loadFlightData(Flight flight) {
         activeFlightAltitudePanel.getChildren().clear();
         activeFlightSpeedPanel.getChildren().clear();
@@ -388,8 +277,8 @@ public class FlightController {
         if (flight != null) {
             final List<FlightEvent> events = flightService.getFlightEvents(flight);
 
-            drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
-            drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
+            mapService.drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
+            mapService.drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
         }
     }
 
