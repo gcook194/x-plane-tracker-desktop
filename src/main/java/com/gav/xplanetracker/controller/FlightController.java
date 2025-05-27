@@ -216,11 +216,13 @@ public class FlightController {
                 })
                 .toList();
 
+        final double heading = events.getLast().getHeading();
+
         if (!latLongs.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String jsonLatLongs = mapper.writeValueAsString(latLongs);
-                webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs  +");");
+                webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs  +"," + heading + ");");
             } catch (JsonProcessingException e) {
                 logger.error("Could not parse latLong data to JSON", e);
             }

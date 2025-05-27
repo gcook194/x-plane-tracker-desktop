@@ -85,12 +85,36 @@
         }
     }
 
-    function drawActualRouteLine(latLongs) {
+    function addRotatedPlaneMarker(latLong, heading) {
+        const adjustedHeading = heading - 90; // Adjust for original east-facing SVG
+
+        const iconHtml = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1200 1200"
+                 style="transform: rotate(${adjustedHeading}deg); transform-origin: center;">
+                <path d="M321,1164h120l269.28-480.06H1020c0,0,180,0,180-83.94c0-84-180-84-180-84H710.28L441,36H321l149.28,480H255.06L120,395.94H0l96.06,204L0,804h120l135.06-120.06h215.22L321,1164z"
+                      fill="#3498db"/>
+            </svg>
+        `;
+
+        const planeIcon = L.divIcon({
+            className: '',
+            html: iconHtml,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+        });
+
+        L.marker(latLong, { icon: planeIcon }).addTo(map);
+    }
+
+    function drawActualRouteLine(latLongs, heading) {
         const flightPath = L.polyline(latLongs, {
             weight: 1,
             opacity: 0.8,
             smoothFactor: 1
         }).addTo(map);
+
+        const lastCoord = latLongs[latLongs.length - 1];
+        addRotatedPlaneMarker(lastCoord, heading);
 
         map.fitBounds(flightPath.getBounds());
     }
