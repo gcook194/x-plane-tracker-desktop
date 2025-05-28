@@ -7,6 +7,7 @@ public class Waypoint {
     private String viaAirway;
     private double latitude;
     private double longitude;
+    private int distance; // TODO unsure if distance from last or distance to next - work this out
 
     public String getName() {
         return name;
@@ -46,5 +47,13 @@ public class Waypoint {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 }

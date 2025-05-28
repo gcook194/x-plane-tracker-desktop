@@ -122,6 +122,7 @@ public class NavigraphService {
             final String viaAirway = fix.path("via_airway").asText();
             final double latitude = fix.path("pos_lat").asDouble();
             final double longitude = fix.path("pos_long").asDouble();
+            final int distance = fix.path("distance").asInt();
 
             logger.info("\t {}, lat: {}, long: {}", name, latitude, longitude);
 
@@ -131,6 +132,7 @@ public class NavigraphService {
             waypoint.setViaAirway(viaAirway);
             waypoint.setLatitude(latitude);
             waypoint.setLongitude(longitude);
+            waypoint.setDistance(distance);
 
             waypoints.add(waypoint);
         });
@@ -157,6 +159,12 @@ public class NavigraphService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int getPlannedFlightDistance(NavigraphFlightPlan flightPlan) {
+        return flightPlan.getWaypoints().stream()
+                .map(Waypoint::getDistance)
+                .reduce(0, Integer::sum);
     }
 
     private JsonNode getRootNode(final boolean useNavigraphApi) throws IOException {
