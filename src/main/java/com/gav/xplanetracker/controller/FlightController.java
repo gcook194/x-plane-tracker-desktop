@@ -3,6 +3,7 @@ package com.gav.xplanetracker.controller;
 import com.gav.xplanetracker.dto.ApplicationSettingsDTO;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightEventType;
+import com.gav.xplanetracker.enums.IntlDateLineOffset;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.service.*;
@@ -198,11 +199,14 @@ public class FlightController {
                 navigraphWebEngine.executeScript("loadMap();");
 
                 if (flight != null) {
+                    final IntlDateLineOffset idlLongitudeOffset = mapService.getIntlDateLineOffset(navigraphFlightPlan);
+
                     mapService.addMarker(
                             navigraphWebEngine,
                             navigraphFlightPlan.getDeparture().getLatitude(),
                             navigraphFlightPlan.getDeparture().getLongitude(),
-                            navigraphFlightPlan.getDeparture().getName()
+                            navigraphFlightPlan.getDeparture().getName(),
+                            idlLongitudeOffset
                     );
 
                     navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
@@ -210,15 +214,19 @@ public class FlightController {
                                 navigraphWebEngine,
                                 waypoint.getLatitude(),
                                 waypoint.getLongitude(),
-                                waypoint.getName()
+                                waypoint.getName(),
+                                idlLongitudeOffset
                         );
+
+                        logger.debug("[{}, {}]", waypoint.getLatitude(), waypoint.getLongitude());
                     });
 
                     mapService.addMarker(
                             navigraphWebEngine,
                             navigraphFlightPlan.getArrival().getLatitude(),
                             navigraphFlightPlan.getArrival().getLongitude(),
-                            navigraphFlightPlan.getArrival().getName()
+                            navigraphFlightPlan.getArrival().getName(),
+                            idlLongitudeOffset
                     );
 
                     navigraphWebEngine.executeScript("drawBasicRouteLine();");

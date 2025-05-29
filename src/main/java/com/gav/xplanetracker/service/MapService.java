@@ -2,7 +2,9 @@ package com.gav.xplanetracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightEventType;
+import com.gav.xplanetracker.enums.IntlDateLineOffset;
 import com.gav.xplanetracker.model.FlightEvent;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -33,9 +35,20 @@ public class MapService {
         return INSTANCE;
     }
 
-    public void addMarker(WebEngine webEngine, double latitude, double longitude, String label) {
-        // drawing lines between waypoints breaks if longitude is negative
-        longitude += 360;
+    public void addMarker(WebEngine webEngine, double latitude, double longitude, String label, IntlDateLineOffset offset) {
+        switch (offset) {
+            case IntlDateLineOffset.EASTBOUND -> {
+                if (longitude < 0) {
+                    longitude += IntlDateLineOffset.EASTBOUND.getOffset();
+                }
+            }
+            case IntlDateLineOffset.WESTBOUND -> {
+                if (longitude > 0) {
+                    longitude += IntlDateLineOffset.WESTBOUND.getOffset();
+                }
+            }
+            default -> logger.debug("Flight does not cross the international date line");
+        }
 
         try {
             final ObjectMapper mapper = new ObjectMapper();
@@ -112,6 +125,21 @@ public class MapService {
         chart.getData().add(series);
 
         chartContainer.getChildren().add(chart);
+    }
+
+    public IntlDateLineOffset getIntlDateLineOffset(NavigraphFlightPlan flightPlan) {
+        final double departureLongitude = flightPlan.getDeparture().getLongitude();
+        final double arrivalLongitude = flightPlan.getArrival().getLongitude();
+
+        final double delta = arrivalLongitude - departureLongitude;
+
+        if (delta > 180) {
+            return IntlDateLineOffset.WESTBOUND;
+        } else if (delta < -180) {
+            return IntlDateLineOffset.EASTBOUND;
+        }
+
+        return IntlDateLineOffset.NONE;
     }
 
     private void addDataPointToChart(List<FlightEvent> events, XYChart.Series<String, Number> series, Function<FlightEvent, Double> methodToCall) {

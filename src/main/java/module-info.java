@@ -11,6 +11,7 @@ module com.gav.xplanetracker {
     requires jdk.jsobject;
     requires org.slf4j;
     requires java.desktop;
+    requires java.naming;
 
 
     opens com.gav.xplanetracker to javafx.fxml;
