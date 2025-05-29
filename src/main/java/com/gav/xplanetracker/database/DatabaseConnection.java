@@ -19,32 +19,34 @@ public class DatabaseConnection {
 
     private static final String URL = "jdbc:sqlite:src/main/resources/db/sqlite/flights.db";
 
-    //TODO this works for mac but not windows
-    private static final Path DB_PATH = Paths.get(System.getProperty("user.home"),
-            "Library", "Application Support", "x-plane-tracker", "flights.db");
-
     public static Connection connect() {
         try {
-            final String os = System.getProperty("os.name").toLowerCase();
-
-            return DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+            final Path databasePath = getDatabasePath();
+            return DriverManager.getConnection("jdbc:sqlite:" + databasePath);
         } catch (SQLException e) {
-            e.printStackTrace();
             logger.error("SQLite connection failed: {}", e.getMessage(), e);
             return null;
         }
     }
 
     public static void setupDatabase() throws IOException {
-        if (Files.notExists(DB_PATH)) {
-            Files.createDirectories(DB_PATH.getParent());
+        final Path databasePath = getDatabasePath();
+        if (Files.notExists(databasePath)) {
+            Files.createDirectories(databasePath.getParent());
 
             try (InputStream dbStream = DatabaseConnection.class.getResourceAsStream("/db/sqlite/flights.db")) {
                 if (dbStream == null) {
                     throw new FileNotFoundException("Database not found in resources.");
                 }
-                Files.copy(dbStream, DB_PATH);
+                Files.copy(dbStream, databasePath);
             }
         }
+    }
+
+    //TODO works for mac os but not windows
+    public static Path getDatabasePath() {
+        final String os = System.getProperty("os.name").toLowerCase();
+        return Paths.get(System.getProperty("user.home"),
+                "Library", "Application Support", "x-plane-tracker", "flights.db");
     }
 }

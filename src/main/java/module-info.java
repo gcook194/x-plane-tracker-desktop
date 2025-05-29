@@ -10,6 +10,7 @@ module com.gav.xplanetracker {
     requires java.desktop;
     requires java.naming;
     requires java.net.http;
+    requires flyway.core;
 
 
     opens com.gav.xplanetracker to javafx.fxml;
