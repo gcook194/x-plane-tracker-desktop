@@ -76,8 +76,16 @@ public class FlightService {
         getActiveFlight().ifPresent(this::completeFlight);
     }
 
+    public void cancelActiveFlight() {
+        getActiveFlight().ifPresent(this::cancelFlight);
+    }
+
     private void completeFlight(Flight flight) {
         flightDao.completeFlight(flight);
+    }
+
+    private void cancelFlight(Flight flight) {
+        flightDao.cancelFlight(flight);
     }
 
     public List<FlightEvent> getFlightEvents(Flight flight) {

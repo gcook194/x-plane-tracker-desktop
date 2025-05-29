@@ -71,6 +71,9 @@ public class FlightController {
     private Button stopFlight;
 
     @FXML
+    private Button cancelFlight;
+
+    @FXML
     private VBox leftPanel;
 
     @FXML
@@ -167,6 +170,26 @@ public class FlightController {
 
         stopFlight.setVisible(false);
         stopFlight.setManaged(false);
+        cancelFlight.setVisible(false);
+        cancelFlight.setVisible(false);
+        flightDetailsBox.setVisible(false);
+        flightDetailsBox.setManaged(false);
+        flightInfoBox.setVisible(false);
+        flightInfoBox.setManaged(false);
+        startFlight.setVisible(true);
+        startFlight.setManaged(true);
+
+        noActiveFlightView();
+    }
+
+    @FXML
+    protected void onCancelFlightClick() {
+        flightService.cancelActiveFlight();
+
+        stopFlight.setVisible(false);
+        stopFlight.setManaged(false);
+        cancelFlight.setVisible(false);
+        cancelFlight.setVisible(false);
         flightDetailsBox.setVisible(false);
         flightDetailsBox.setManaged(false);
         flightInfoBox.setVisible(false);
@@ -305,6 +328,9 @@ public class FlightController {
 
         stopFlight.setVisible(true);
         stopFlight.setManaged(true);
+
+        cancelFlight.setVisible(true);
+        cancelFlight.setVisible(true);
 
         aircraftType.setText(flight.getAircraftTypeIcao());
         aircraftReg.setText(flight.getAircraftReg());

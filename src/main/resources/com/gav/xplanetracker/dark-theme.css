@@ -51,7 +51,6 @@
     -fx-padding: 0 0 10 0;
 }
 
-/* Primary Button Style (Blue) */
 .primary-button {
     -fx-background-color: #3498db;
     -fx-text-fill: white;
@@ -63,6 +62,22 @@
 
 .primary-button:hover {
     -fx-background-color: #2980b9;
+}
+
+.cancel-button {
+    -fx-background-color: #4a4a4a;   /* dark grey background */
+    -fx-text-fill: #cccccc;           /* light grey text */
+    -fx-font-size: 14px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #666666;
+    -fx-transition: background-color 0.3s ease, -fx-text-fill 0.3s ease;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #6e6e6e;   /* lighter dark grey on hover */
+    -fx-text-fill: #ffffff;           /* white text on hover */
 }
 
 .label-title {

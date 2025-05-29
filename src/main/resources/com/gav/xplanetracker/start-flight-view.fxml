@@ -22,7 +22,10 @@
                     </HBox>
 
                     <Button fx:id="startFlight" text="Start Flight" onAction="#onStartFlightClick" styleClass="primary-button" maxWidth="Infinity"/>
-                    <Button fx:id="stopFlight" text="Complete Flight" onAction="#onStopFlightClick" visible="false" styleClass="primary-button" maxWidth="Infinity"/>
+                    <HBox spacing="10">
+                        <Button fx:id="stopFlight" text="Complete Flight" onAction="#onStopFlightClick" visible="false" styleClass="primary-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="cancelFlight" text="Cancel Flight" onAction="#onCancelFlightClick" visible="false" styleClass="cancel-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    </HBox>
 
                     <VBox fx:id="loadingBox" spacing="10" alignment="CENTER" visible="false" managed="false">
                         <ProgressIndicator />

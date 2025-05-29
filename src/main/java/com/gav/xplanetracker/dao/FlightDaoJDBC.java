@@ -139,4 +139,19 @@ public class FlightDaoJDBC {
             logger.error("Error while stopping flight: ", e);
         }
     }
+
+    public void cancelFlight(Flight flight) {
+        final String SQL = "UPDATE flight SET status = ?, cancelled_at = ? WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.connect()) {
+            final PreparedStatement ps = connection.prepareStatement(SQL);
+            ps.setString(1, FlightStatus.CANCELLED.name());
+            ps.setString(2, Instant.now().toString());
+            ps.setLong(3, flight.getId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while cancelling flight: ", e);
+        }
+    }
 }
