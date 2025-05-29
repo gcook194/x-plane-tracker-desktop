@@ -5,7 +5,6 @@ module com.gav.xplanetracker {
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.databind;
     requires java.sql;
-    requires flyway.core;
     requires javafx.web;
     requires org.slf4j;
     requires java.desktop;
