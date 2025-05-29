@@ -181,7 +181,7 @@ public class FlightController {
     private void onActiveFlightProgressTabSelected() {
         logger.debug("refreshing active flight progress tab");
         flightService.getActiveFlight()
-                .ifPresent(flight -> loadMap(true, flight));
+                .ifPresent(this::loadMap);
     }
 
     @FXML
@@ -242,13 +242,13 @@ public class FlightController {
         navigraphMapPanel.getChildren().add(navigraphWebView);
     }
 
-    private void loadMap(boolean drawFlightDetails, Flight flight) {
+    private void loadMap(Flight flight) {
         webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
 
         webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 webEngine.executeScript("loadMap();");
-                if (drawFlightDetails) {
+                if (flight != null) {
                     final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
                     mapService.drawActualRoute(webEngine, flightEvents);
                 }
@@ -323,12 +323,12 @@ public class FlightController {
 
 
         loadNavigraphMap(flight);
-        loadMap(true, flight);
+        loadMap(flight);
         loadFlightData(flight);
     }
 
     private void noActiveFlightView() {
-        loadMap(false, null);
+        loadMap(null);
         loadNavigraphMap(null);
         loadFlightData(null);
     }
