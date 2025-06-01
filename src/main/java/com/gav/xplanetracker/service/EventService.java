@@ -5,12 +5,14 @@ import com.gav.xplanetracker.dao.FlightEventDaoJDBC;
 import com.gav.xplanetracker.dto.xplane.*;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.Arrays;
 
@@ -26,17 +28,18 @@ public class EventService {
     public static final String LATITUDE_DATAREF_NAME = "sim/flightmodel/position/latitude";
     public static final String LONGITUDE_DATAREF_NAME = "sim/flightmodel/position/longitude";
     public static final String HEADING_DATAREF_NAME = "sim/flightmodel/position/mag_psi";
-    public static final String AIRCRAFT_REG_DATAREF_NAME = "sim/aircraft/view/acf_tailnum";
     public static final String ENGINES_RUNNING_DATAREF_NAME = "sim/flightmodel/engine/ENGN_running";
 
     private static EventService INSTANCE;
 
     private final FlightEventDaoJDBC flightEventDao;
-    private final OkHttpClient client;
+    private final HttpClient client;
+    private final ObjectMapper objectMapper;
 
     public EventService() {
         this.flightEventDao = FlightEventDaoJDBC.getInstance();
-        this.client = new OkHttpClient();
+        this.client = HttpClient.newHttpClient();
+        this.objectMapper = new ObjectMapper();
     }
 
     public static EventService getInstance() {
@@ -82,18 +85,15 @@ public class EventService {
                 "&filter[name]=" + HEADING_DATAREF_NAME +
                 "&filter[name]=" + ENGINES_RUNNING_DATAREF_NAME;
 
-        final Request request = new Request.Builder()
-                .url(datarefUri)
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(datarefUri))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(body, XplaneDataRefListDTO.class);
-        } catch (IOException e) {
+            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return objectMapper.readValue(response.body(), XplaneDataRefListDTO.class);
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching dataRefs: ", e);
             throw new RuntimeException(e);
         }
@@ -106,24 +106,21 @@ public class EventService {
                 .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(densityAltDataRefId))
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(densityAltDataRefId)))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
             }
 
             throw new RuntimeException("No density altitude returned from simulator API");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching pressure altitude: ", e);
             throw new RuntimeException(e);
         }
@@ -136,24 +133,21 @@ public class EventService {
                 .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(groundSpeedDataRefId))
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(groundSpeedDataRefId)))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
             }
 
             throw new RuntimeException("No density altitude returned from simulator API");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching ground speed: ", e);
             throw new RuntimeException(e);
         }
@@ -166,24 +160,21 @@ public class EventService {
                 .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(latitudeDataRefId))
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(latitudeDataRefId)))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
             }
 
             throw new RuntimeException("No density altitude returned from simulator API");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching latitude: ", e);
             throw new RuntimeException(e);
         }
@@ -196,24 +187,21 @@ public class EventService {
                 .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(longitudeDataRefId))
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(longitudeDataRefId)))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
             }
 
             throw new RuntimeException("No density altitude returned from simulator API");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching longitude: ", e);
             throw new RuntimeException(e);
         }
@@ -226,24 +214,21 @@ public class EventService {
                 .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(longitudeDataRefId))
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(longitudeDataRefId)))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
 
             if (response != null) {
                 return Double.parseDouble(response.data());
             }
 
             throw new RuntimeException("No heading returned from simulator API");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching tail number: ", e);
             throw new RuntimeException(e);
         }
@@ -256,17 +241,14 @@ public class EventService {
                 .map(XplaneDataRefDTO::getId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(enginesRunningDataRefId))
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(enginesRunningDataRefId)))
+                .GET()
                 .build();
 
         try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiListResponse response = mapper.readValue(body, XplaneApiListResponse.class);
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiListResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiListResponse.class);
 
             if (response != null) {
                 return Arrays.stream(response.data())
@@ -274,37 +256,7 @@ public class EventService {
             }
 
             throw new RuntimeException("No heading returned from simulator API");
-        } catch (IOException e) {
-            logger.error("Error when fetching tail number: ", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String getAircraftReg(XplaneDataRefListDTO dataRefs) {
-        final String registrationDataRefId = dataRefs.getData().stream()
-                .filter(dataRef -> dataRef.getName().equals(AIRCRAFT_REG_DATAREF_NAME))
-                .findAny()
-                .map(XplaneDataRefDTO::getId)
-                .orElseThrow(IllegalArgumentException::new);
-
-        final Request request = new Request.Builder()
-                .url(xPlaneDataRefReqUri(registrationDataRefId))
-                .build();
-
-        try {
-            final String body = client.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-            final ObjectMapper mapper = new ObjectMapper();
-            final XplaneApiResponse response = mapper.readValue(body, XplaneApiResponse.class);
-
-            if (response != null) {
-                return response.data();
-            }
-
-            return "";
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching tail number: ", e);
             throw new RuntimeException(e);
         }

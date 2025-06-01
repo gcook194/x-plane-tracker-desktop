@@ -1,6 +1,5 @@
 package com.gav.xplanetracker;
 
-import com.gav.xplanetracker.database.DatabaseMigration;
 import com.gav.xplanetracker.scheduler.FlightEventScheduler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -19,8 +18,6 @@ public class XplaneTrackerApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        DatabaseMigration.runMigrations("src/main/resources/db/sqlite/flights.db");
-
         FXMLLoader fxmlLoader = new FXMLLoader(XplaneTrackerApplication.class.getResource("base-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1920, 1080);
         stage.setTitle("X-Plane Flight Tracker");
