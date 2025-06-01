@@ -1,12 +1,13 @@
 package com.gav.xplanetracker.service;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class XPlaneService {
 
@@ -14,10 +15,10 @@ public class XPlaneService {
 
     private static XPlaneService INSTANCE;
 
-    private final OkHttpClient client;
+    private final HttpClient client;
 
     public XPlaneService() {
-        this.client = new OkHttpClient();
+        this.client = HttpClient.newHttpClient();
     }
 
     public static XPlaneService getInstance() {
@@ -28,13 +29,14 @@ public class XPlaneService {
     }
 
     public boolean isSimulatorRunning(String xplaneHost) {
-        final Request request = new Request.Builder()
-                .url(xplaneHost)
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xplaneHost))
+                .GET()
                 .build();
 
-        try (ResponseBody body = client.newCall(request).execute().body()) {
-            body.string();
-        } catch (IOException e) {
+        try {
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
             logger.warn("Simulator is not running or may be exposing a different port - check X-Plane settings");
             return false;
         }

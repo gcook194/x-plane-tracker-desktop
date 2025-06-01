@@ -7,14 +7,15 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.gav.xplanetracker.dao.SettingsDaoJDBC;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.dto.navigraph.Waypoint;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +27,12 @@ public class NavigraphService {
     private static NavigraphService INSTANCE;
 
     private final SettingsDaoJDBC settingsDao;
-    private final OkHttpClient client;
+    private final HttpClient client;
     private final XmlMapper xmlMapper;
 
     public NavigraphService() {
         this.settingsDao = SettingsDaoJDBC.getInstance();
-        this.client = new OkHttpClient();
+        this.client = HttpClient.newHttpClient();
         this.xmlMapper = new XmlMapper();
         configureXmlMapper();
     }
@@ -156,7 +157,7 @@ public class NavigraphService {
             logger.info("Finished loading Navigraph flight plan");
 
             return flightPlan;
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -167,15 +168,18 @@ public class NavigraphService {
                 .reduce(0, Integer::sum);
     }
 
-    private JsonNode getRootNode(final boolean useNavigraphApi) throws IOException {
+    private JsonNode getRootNode(final boolean useNavigraphApi) throws IOException, InterruptedException {
         if (useNavigraphApi) {
             final String simbriefUser = settingsDao.getSimbriefUsername(); //Gavin194
-            final Request request = new Request.Builder()
-                    .url(SIMBRIEF_URI + "?username=" + simbriefUser)
-                    .build();
-            final Response response = client.newCall(request).execute();
 
-            return xmlMapper.readTree(response.body().string());
+            final HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(SIMBRIEF_URI + "?username=" + simbriefUser))
+                    .GET()
+                    .build();
+
+            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return xmlMapper.readTree(response.body());
         } else {
             try (InputStream inputStream =
                          NavigraphService.class.getClassLoader().getResourceAsStream("test-data/simbrief.xml")) {
