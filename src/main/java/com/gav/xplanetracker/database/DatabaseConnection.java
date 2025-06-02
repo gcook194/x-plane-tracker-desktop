@@ -43,10 +43,18 @@ public class DatabaseConnection {
         }
     }
 
-    //TODO works for mac os but not windows
+    // TODO Test on Windows
+    // TODO Dynamically fetch install location on Windows
     public static Path getDatabasePath() {
         final String os = System.getProperty("os.name").toLowerCase();
-        return Paths.get(System.getProperty("user.home"),
-                "Library", "Application Support", "x-plane-tracker", "flights.db");
+
+        if (os.toLowerCase().contains("mac")) {
+            return Paths.get(System.getProperty("user.home"),
+                    "Library", "Application Support", "x-plane-tracker", "flights.db");
+        } else if (os.toLowerCase().contains("win")) {
+            return Paths.get(System.getenv("APPDATA"),"x-plane-tracker", "flights.db");
+        }
+
+        throw new IllegalArgumentException("Operating System " + os + " Not supported.");
     }
 }
