@@ -347,7 +347,6 @@ public class FlightController {
                 )
         );
 
-
         loadNavigraphMap(flight);
         loadMap(flight);
         loadFlightData(flight);
