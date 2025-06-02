@@ -225,5 +225,29 @@
     -fx-shape: "";
 }
 
+.flight-list {
+    -fx-background-color: #2e2e2e;
+    -fx-control-inner-background: #2e2e2e;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-border-color: #444444;
+    -fx-border-width: 1;
+    -fx-padding: 5;
+}
 
+.flight-list .list-cell {
+    -fx-background-color: #2e2e2e;
+    -fx-text-fill: #bbbbbb;
+    -fx-padding: 10 5;
+}
+
+.flight-list .list-cell:hover {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #ffffff;
+}
+
+.flight-list .list-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: #ffffff;
+}
 ``

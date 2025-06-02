@@ -49,7 +49,7 @@ public class DatabaseConnection {
     // TODO Dynamically fetch install location on Windows
     public static Path getDatabasePath() {
         final String os = System.getProperty("os.name").toLowerCase();
-        logger.info("Operating System {}", os);
+        logger.debug("Operating System {}", os);
 
         if (os.toLowerCase().contains("mac")) {
             return Paths.get(System.getProperty("user.home"),

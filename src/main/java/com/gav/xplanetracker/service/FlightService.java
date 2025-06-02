@@ -104,4 +104,8 @@ public class FlightService {
             throw new RuntimeException(e);
         }
     }
+
+    public List<Flight> getFlights() {
+        return flightDao.getFlightsByStatus(FlightStatus.COMPLETED);
+    }
 }

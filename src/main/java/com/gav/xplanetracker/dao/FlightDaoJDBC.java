@@ -154,4 +154,52 @@ public class FlightDaoJDBC {
             logger.error("Error while cancelling flight: ", e);
         }
     }
+
+    public List<Flight> getFlightsByStatus(FlightStatus flightStatus) {
+        final String SQL = "SELECT * FROM flight WHERE status = ? ORDER BY completed_at DESC";
+
+        try (Connection connection = DatabaseConnection.connect()) {
+            final List<Flight> flights = new ArrayList<>();
+
+            final PreparedStatement ps = connection.prepareStatement(SQL);
+            ps.setString(1, flightStatus.name());
+
+            final ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                final Flight flight = new Flight();
+                flight.setId(rs.getInt("id"));
+                flight.setUserId(UUID.fromString(rs.getString("user_id")));
+
+                //TODO probably need null checks on these date operations
+                flight.setCreatedAt(Instant.parse(rs.getString("created_at")));
+                flight.setStartedAt(Instant.parse(rs.getString("started_at")));
+
+                final String completedAt = rs.getString("completed_at");
+                if (completedAt != null) {
+                    flight.setCompletedAt(Instant.parse(completedAt));
+                }
+
+                final String cancelledAt = rs.getString("cancelled_at");
+                if (cancelledAt != null) {
+                    flight.setCancelledAt(Instant.parse(cancelledAt));
+                }
+
+                flight.setFlightNumberIcao(rs.getString("flight_number_icao"));
+                flight.setAircraftTypeIcao(rs.getString("aircraft_type"));
+                flight.setAircraftReg(rs.getString("aircraft_reg"));
+                flight.setDepartureAirportIcao(rs.getString("departure_airport_icao"));
+                flight.setArrivalAirportIcao(rs.getString("arrival_airport_icao"));
+                flight.setStatus(FlightStatus.IN_PROGRESS); // TODO update enum to get name by string
+                flight.setNavigraphJson(rs.getString("navigraph_json"));
+
+                flights.add(flight);
+            }
+
+            return flights;
+        } catch (SQLException e) {
+            logger.error("Error while getting flight list by status: ", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

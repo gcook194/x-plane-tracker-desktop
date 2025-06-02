@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.gav.xplanetracker.controller.FlightHistoryController">
+    <center>
+        <StackPane>
+            <HBox fx:id="rootBox">
+
+                <!-- Left Panel (1/3 width - Flight list) -->
+                <VBox fx:id="leftPanel" styleClass="side-panel" maxWidth="Infinity">
+                    <ListView fx:id="flightHistoryList"
+                              styleClass="flight-list"
+                              VBox.vgrow="ALWAYS">
+
+                    </ListView>
+                </VBox>
+
+                <!-- Right Panel (2/3 width - Flight Details) -->
+                <VBox fx:id="flightInfoPanel" styleClass="map-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns:fx="http://javafx.com/fxml">
+                    <TabPane fx:id="flightDetailsPane" tabClosingPolicy="UNAVAILABLE" visible="false" managed="false">
+                        <Tab text="Details"></Tab>
+                        <Tab text="Flight Plan">
+                            <AnchorPane>
+                                <VBox fx:id="simbriefRoutePanel">
+                                    <!-- populated with web view -->
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                        <Tab text="Route">
+                            <AnchorPane>
+                                <VBox fx:id="flightMapPanel">
+                                    <!-- populated with web view -->
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                        <Tab text="Flight Data">
+                            <AnchorPane>
+                                <VBox fx:id="chartsContainer"
+                                      AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                      spacing="10">
+                                    <VBox fx:id="flightSpeedPanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
+
+                                    <VBox fx:id="flightAltitudePanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                    </TabPane>
+                </VBox>
+            </HBox>
+        </StackPane>
+    </center>
+</BorderPane>
