@@ -6,6 +6,7 @@ import com.gav.xplanetracker.enums.FlightEventType;
 import com.gav.xplanetracker.enums.IntlDateLineOffset;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
+import com.gav.xplanetracker.model.MapOptions;
 import com.gav.xplanetracker.service.*;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
@@ -222,7 +223,9 @@ public class FlightController {
                 navigraphWebEngine.executeScript("loadMap();");
 
                 if (flight != null) {
-                    final IntlDateLineOffset idlLongitudeOffset = mapService.getIntlDateLineOffset(navigraphFlightPlan);
+                    double departureLong = navigraphFlightPlan.getDeparture().getLongitude();
+                    double arrivalLong = navigraphFlightPlan.getArrival().getLongitude();
+                    final IntlDateLineOffset idlLongitudeOffset = mapService.getIntlDateLineOffset(departureLong, arrivalLong);
 
                     mapService.addMarker(
                             navigraphWebEngine,
@@ -273,7 +276,11 @@ public class FlightController {
                 webEngine.executeScript("loadMap();");
                 if (flight != null) {
                     final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
-                    mapService.drawActualRoute(webEngine, flightEvents);
+
+                    final MapOptions mapOptions = new MapOptions()
+                            .setShowAircraftOnMap(true)
+                            .setShowDepartureArrival(false);
+                    mapService.drawActualRoute(webEngine, flightEvents, mapOptions);
                 }
             }
         });

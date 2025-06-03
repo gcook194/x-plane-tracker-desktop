@@ -89,24 +89,7 @@ public class FlightDaoJDBC {
             final ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                final Flight flight = new Flight();
-                flight.setId(rs.getInt("id"));
-                flight.setUserId(UUID.fromString(rs.getString("user_id")));
-
-                //TODO probably need null checks on these date operations
-                flight.setCreatedAt(Instant.parse(rs.getString("created_at")));
-                flight.setStartedAt(Instant.parse(rs.getString("started_at")));
-//                flight.setCompletedAt(Instant.parse(rs.getString("completed_at")));
-//                flight.setCancelledAt(Instant.parse(rs.getString("cancelled_at")));
-
-                flight.setFlightNumberIcao(rs.getString("flight_number_icao"));
-                flight.setAircraftTypeIcao(rs.getString("aircraft_type"));
-                flight.setAircraftReg(rs.getString("aircraft_reg"));
-                flight.setDepartureAirportIcao(rs.getString("departure_airport_icao"));
-                flight.setArrivalAirportIcao(rs.getString("arrival_airport_icao"));
-                flight.setStatus(FlightStatus.IN_PROGRESS); // TODO update enum to get name by string
-                flight.setNavigraphJson(rs.getString("navigraph_json"));
-
+                final Flight flight = mapFlight(rs);
                 flights.add(flight);
             }
 
@@ -167,32 +150,7 @@ public class FlightDaoJDBC {
             final ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                final Flight flight = new Flight();
-                flight.setId(rs.getInt("id"));
-                flight.setUserId(UUID.fromString(rs.getString("user_id")));
-
-                //TODO probably need null checks on these date operations
-                flight.setCreatedAt(Instant.parse(rs.getString("created_at")));
-                flight.setStartedAt(Instant.parse(rs.getString("started_at")));
-
-                final String completedAt = rs.getString("completed_at");
-                if (completedAt != null) {
-                    flight.setCompletedAt(Instant.parse(completedAt));
-                }
-
-                final String cancelledAt = rs.getString("cancelled_at");
-                if (cancelledAt != null) {
-                    flight.setCancelledAt(Instant.parse(cancelledAt));
-                }
-
-                flight.setFlightNumberIcao(rs.getString("flight_number_icao"));
-                flight.setAircraftTypeIcao(rs.getString("aircraft_type"));
-                flight.setAircraftReg(rs.getString("aircraft_reg"));
-                flight.setDepartureAirportIcao(rs.getString("departure_airport_icao"));
-                flight.setArrivalAirportIcao(rs.getString("arrival_airport_icao"));
-                flight.setStatus(FlightStatus.IN_PROGRESS); // TODO update enum to get name by string
-                flight.setNavigraphJson(rs.getString("navigraph_json"));
-
+                final Flight flight = mapFlight(rs);
                 flights.add(flight);
             }
 
@@ -201,5 +159,41 @@ public class FlightDaoJDBC {
             logger.error("Error while getting flight list by status: ", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private Flight mapFlight(ResultSet rs) throws SQLException {
+        final Flight flight = new Flight();
+        flight.setId(rs.getInt("id"));
+        flight.setUserId(UUID.fromString(rs.getString("user_id")));
+
+        final String createdAt = rs.getString("created_at");
+        if (createdAt != null) {
+            flight.setCreatedAt(Instant.parse(createdAt));
+        }
+
+        final String startedAt = rs.getString("started_at");
+        if (startedAt != null) {
+            flight.setStartedAt(Instant.parse(startedAt));
+        }
+
+        final String completedAt = rs.getString("completed_at");
+        if (completedAt != null) {
+            flight.setCompletedAt(Instant.parse(completedAt));
+        }
+
+        final String cancelledAt = rs.getString("cancelled_at");
+        if (cancelledAt != null) {
+            flight.setCancelledAt(Instant.parse(cancelledAt));
+        }
+
+        flight.setFlightNumberIcao(rs.getString("flight_number_icao"));
+        flight.setAircraftTypeIcao(rs.getString("aircraft_type"));
+        flight.setAircraftReg(rs.getString("aircraft_reg"));
+        flight.setDepartureAirportIcao(rs.getString("departure_airport_icao"));
+        flight.setArrivalAirportIcao(rs.getString("arrival_airport_icao"));
+        flight.setStatus(FlightStatus.valueOf(rs.getString("status")));
+        flight.setNavigraphJson(rs.getString("navigraph_json"));
+
+        return flight;
     }
 }

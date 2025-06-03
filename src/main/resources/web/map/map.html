@@ -109,8 +109,10 @@
             smoothFactor: 1
         }).addTo(map);
 
-        const lastCoord = latLongs[latLongs.length - 1];
-        addRotatedPlaneMarker(lastCoord, heading);
+        if (heading != null) {
+            const lastCoord = latLongs[latLongs.length - 1];
+            addRotatedPlaneMarker(lastCoord, heading);
+        }
 
         map.fitBounds(flightPath.getBounds());
     }
