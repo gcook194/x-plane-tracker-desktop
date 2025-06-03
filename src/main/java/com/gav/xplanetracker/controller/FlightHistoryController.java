@@ -110,7 +110,9 @@ public class FlightHistoryController {
             }
         });
 
-        flightHistoryList.getSelectionModel().selectedItemProperty().addListener((obs, oldFlight, selectedFlight) -> {
+        flightHistoryList.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldFlight, selectedFlight) -> {
             if (selectedFlight != null) {
                 logger.info("Loading details for flight {}", selectedFlight.getId());
 

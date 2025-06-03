@@ -148,7 +148,6 @@ public class MapService {
         final ObjectMapper mapper = new ObjectMapper();
         try {
             final String jsonLatLong = mapper.writeValueAsString(latLong);
-
             webEngine.executeScript(String.format("addRotatedPlaneMarker(%s, %f);", jsonLatLong, heading));
         } catch (JsonProcessingException e) {
             logger.error("Could not parse latLong data to JSON", e);
