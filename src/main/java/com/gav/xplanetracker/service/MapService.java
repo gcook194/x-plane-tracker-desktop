@@ -77,27 +77,9 @@ public class MapService {
         if (!latLongs.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();
             try {
-                final IntlDateLineOffset idlLongitudeOffset = getIntlDateLineOffset(flightEvents.getFirst().getLongitude(), flightEvents.getLast().getLongitude());
-                if (mapOptions.showDepartureArrival()) {
-                    this.addMarker(
-                            webEngine,
-                            flightEvents.getFirst().getLatitude(),
-                            flightEvents.getFirst().getLongitude(),
-                            null,
-                            idlLongitudeOffset
-                    );
-
-                    this.addMarker(
-                            webEngine,
-                            flightEvents.getLast().getLatitude(),
-                            flightEvents.getLast().getLongitude(),
-                            null,
-                            idlLongitudeOffset
-                    );
-                }
-
                 final String jsonLatLongs = mapper.writeValueAsString(latLongs);
                 final Double heading = mapOptions.showAircraftOnMap() ? flightEvents.getLast().getHeading() : null;
+
                 webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs  +"," + heading + ");");
             } catch (JsonProcessingException e) {
                 logger.error("Could not parse latLong data to JSON", e);

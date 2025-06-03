@@ -44,7 +44,6 @@ public class FlightHistoryController {
         this.navigraphService = NavigraphService.getInstance();
 
         this.webView = new WebView();
-
         this.simbriefWebView = new WebView();
     }
 
@@ -144,6 +143,7 @@ public class FlightHistoryController {
         final MapOptions actualRouteMapOptions = new MapOptions()
                 .setShowAircraftOnMap(false)
                 .setShowDepartureArrival(true);
+
         mapService.drawFlightRouteMap(webView, flightMapPanel, flightEvents, actualRouteMapOptions);
 
         // flight data
