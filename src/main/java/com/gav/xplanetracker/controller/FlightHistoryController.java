@@ -5,6 +5,7 @@ import com.gav.xplanetracker.enums.FlightEventType;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.model.MapOptions;
+import com.gav.xplanetracker.service.ChartService;
 import com.gav.xplanetracker.service.FlightService;
 import com.gav.xplanetracker.service.MapService;
 import com.gav.xplanetracker.service.NavigraphService;
@@ -33,6 +34,7 @@ public class FlightHistoryController {
     private final FlightService flightService;
     private final MapService mapService;
     private final NavigraphService navigraphService;
+    private final ChartService chartService;
 
     final WebView webView;
 
@@ -42,6 +44,7 @@ public class FlightHistoryController {
         this.flightService = FlightService.getInstance();
         this.mapService = MapService.getInstance();
         this.navigraphService = NavigraphService.getInstance();
+        this.chartService = ChartService.getInstance();
 
         this.webView = new WebView();
         this.simbriefWebView = new WebView();
@@ -154,7 +157,7 @@ public class FlightHistoryController {
         flightAltitudePanel.getChildren().clear();
         flightSpeedPanel.getChildren().clear();
 
-        mapService.drawLineGraph(flightAltitudePanel, flightEvents, FlightEventType.DENSITY_ALTITUDE);
-        mapService.drawLineGraph(flightSpeedPanel, flightEvents, FlightEventType.GROUND_SPEED);
+        chartService.drawLineGraph(flightAltitudePanel, flightEvents, FlightEventType.DENSITY_ALTITUDE);
+        chartService.drawLineGraph(flightSpeedPanel, flightEvents, FlightEventType.GROUND_SPEED);
     }
 }

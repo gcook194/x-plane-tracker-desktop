@@ -31,6 +31,7 @@ public class FlightController {
     private final XPlaneService xPlaneService;
     private final SettingsService settingsService;
     private final MapService mapService;
+    private final ChartService chartService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
@@ -45,6 +46,7 @@ public class FlightController {
         this.xPlaneService = XPlaneService.getInstance();
         this.settingsService = SettingsService.getInstance();
         this.mapService = MapService.getInstance();
+        this.chartService = ChartService.getInstance();
 
         this.webView = new WebView();
         this.webEngine = webView.getEngine();
@@ -315,8 +317,8 @@ public class FlightController {
         if (flight != null) {
             final List<FlightEvent> events = flightService.getFlightEvents(flight);
 
-            mapService.drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
-            mapService.drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
+            chartService.drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
+            chartService.drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
         }
     }
 

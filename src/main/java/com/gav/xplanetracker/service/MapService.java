@@ -3,27 +3,17 @@ package com.gav.xplanetracker.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
-import com.gav.xplanetracker.enums.FlightEventType;
 import com.gav.xplanetracker.enums.IntlDateLineOffset;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.model.MapOptions;
 import javafx.concurrent.Worker;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.function.Function;
 
 public class MapService {
 
@@ -78,59 +68,12 @@ public class MapService {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 final String jsonLatLongs = mapper.writeValueAsString(latLongs);
-                final Double heading = mapOptions.showAircraftOnMap() ? flightEvents.getLast().getHeading() : null;
 
-                webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs  +"," + heading + ");");
+                webEngine.executeScript("drawActualRouteLine(" + jsonLatLongs + ");");
             } catch (JsonProcessingException e) {
                 logger.error("Could not parse latLong data to JSON", e);
             }
         }
-    }
-
-    public void drawLineGraph(VBox chartContainer, List<FlightEvent> events, FlightEventType eventType) {
-        final CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Time");
-
-        final NumberAxis yAxis = new NumberAxis();
-
-        final LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setLegendVisible(false);
-        chart.setCreateSymbols(false);
-        chart.setAnimated(false);
-        chart.setHorizontalGridLinesVisible(false);
-        chart.setVerticalGridLinesVisible(false);
-        chart.setStyle("-fx-background-color: transparent;");
-
-        final XYChart.Series<String, Number> series = new XYChart.Series<>();
-
-        if (events != null && !events.isEmpty()) {
-            switch (eventType) {
-                case GROUND_SPEED -> {
-                    addDataPointToChart(events, series, FlightEvent::getGroundSpeed);
-
-                    series.setName("Ground Speed");
-                    yAxis.setLabel("Ground Speed (Kts)");
-                    chart.setTitle("Speed over flight duration");
-                }
-                case DENSITY_ALTITUDE -> {
-                    addDataPointToChart(events, series, FlightEvent::getPressureAltitude);
-
-                    series.setName("Altitude");
-                    yAxis.setLabel("Altitude (Ft)");
-                    chart.setTitle("Altitude over flight duration");
-                }
-                default -> throw new IllegalStateException("Event type not supported");
-            }
-
-            xAxis.setTickLabelsVisible(false);
-            xAxis.setTickMarkVisible(false);
-            yAxis.setTickMarkVisible(false);
-        }
-
-        chart.getData().clear();
-        chart.getData().add(series);
-
-        chartContainer.getChildren().add(chart);
     }
 
     public IntlDateLineOffset getIntlDateLineOffset(double departureLongitude, double arrivalLongitude) {
@@ -152,14 +95,37 @@ public class MapService {
         webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 webEngine.executeScript("loadMap();");
+
                 if (flightEvents != null && !flightEvents.isEmpty()) {
                     this.drawActualRoute(webEngine, flightEvents, mapOptions);
+
+                    if (mapOptions.showAircraftOnMap()) {
+                        this.addAircraftToMap(webEngine, flightEvents);
+                    }
                 }
             }
         });
 
         mapPanel.getChildren().clear();
         mapPanel.getChildren().add(webView);
+    }
+
+    private void addAircraftToMap(WebEngine webEngine, List<FlightEvent> flightEvents) {
+        final FlightEvent aircraftPositionEvent = flightEvents.getLast();
+        final double[] latLong = new double[] {
+                aircraftPositionEvent.getLatitude(),
+                aircraftPositionEvent.getLongitude()
+        };
+        final double heading = aircraftPositionEvent.getHeading();
+
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            final String jsonLatLong = mapper.writeValueAsString(latLong);
+
+            webEngine.executeScript(String.format("addRotatedPlaneMarker(%s, %f);", jsonLatLong, heading));
+        } catch (JsonProcessingException e) {
+            logger.error("Could not parse latLong data to JSON", e);
+        }
     }
 
     public void drawSimbriefMap(WebView webView, Pane mapPanel, NavigraphFlightPlan simbriefFlightPlan) {
@@ -209,17 +175,5 @@ public class MapService {
 
         mapPanel.getChildren().clear();
         mapPanel.getChildren().add(webView);
-    }
-
-    private void addDataPointToChart(List<FlightEvent> events, XYChart.Series<String, Number> series, Function<FlightEvent, Double> methodToCall) {
-        events.stream()
-                .filter(FlightEvent::isEnginesRunning)
-                .forEach(event -> {
-                    final OffsetDateTime odt =
-                            OffsetDateTime.ofInstant(event.getCreatedAt(), ZoneId.of("Europe/London"));
-                    final String time = odt.format(DateTimeFormatter.ofPattern("HH:mm"));
-
-                    series.getData().add(new XYChart.Data<>(time, methodToCall.apply(event)));
-                });
     }
 }
