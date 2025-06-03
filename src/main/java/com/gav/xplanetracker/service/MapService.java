@@ -102,12 +102,39 @@ public class MapService {
                     if (mapOptions.showAircraftOnMap()) {
                         this.addAircraftToMap(webEngine, flightEvents);
                     }
+
+                    if (mapOptions.showDepartureArrival()) {
+                        this.addDepartureAndArrivalPins(webEngine, flightEvents);
+                    }
                 }
             }
         });
 
         mapPanel.getChildren().clear();
         mapPanel.getChildren().add(webView);
+    }
+
+    //TODO don't love this - using simbrief plan potentially better
+    private void addDepartureAndArrivalPins(WebEngine webEngine, List<FlightEvent> flightEvents) {
+        final double departureLongitude = flightEvents.getFirst().getLongitude();
+        final double arrivalLongitude = flightEvents.getLast().getLongitude();
+        final IntlDateLineOffset longitudeOffset = getIntlDateLineOffset(departureLongitude, arrivalLongitude);
+
+        addMarker(
+                webEngine,
+                flightEvents.getFirst().getLatitude(),
+                flightEvents.getFirst().getLongitude(),
+                "Departure",
+                longitudeOffset
+        );
+
+        addMarker(
+                webEngine,
+                flightEvents.getLast().getLatitude(),
+                flightEvents.getLast().getLongitude(),
+                "Arrival",
+                longitudeOffset
+        );
     }
 
     private void addAircraftToMap(WebEngine webEngine, List<FlightEvent> flightEvents) {

@@ -19,7 +19,7 @@
         <HBox fx:id="navBar" styleClass="nav-bar" prefHeight="50" alignment="CENTER_LEFT" spacing="10">
             <Label text="✈ Flight Tracker" styleClass="nav-title"/>
             <Button text="Dashboard" styleClass="nav-button" fx:id="dashboardButton"/>
-            <Button text="My Flights" styleClass="nav-button" fx:id="flightsButton"/>
+            <Button text="Flight History" styleClass="nav-button" fx:id="flightsButton"/>
             <Button text="Settings" styleClass="nav-button" fx:id="settingsButton"/>
         </HBox>
     </top>
