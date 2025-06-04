@@ -109,44 +109,4 @@ public class FlightService {
     public List<Flight> getFlights() {
         return flightDao.getFlightsByStatus(FlightStatus.COMPLETED);
     }
-
-    public List<Image> getScreenshots(Flight flight) {
-        final File directory = getScreenshotsFromStorage(flight);
-
-        final String[] EXTENSIONS = new String[] {
-                "gif", "png", "jpg", "jpeg"
-        };
-
-        final FilenameFilter IMAGE_FILTER = (dir, name) -> {
-            for (final String ext : EXTENSIONS) {
-                if (name.endsWith("." + ext)) {
-                    return (true);
-                }
-            }
-            return (false);
-        };
-
-        if (directory.exists() && directory.isDirectory()) {
-                return Arrays.stream(directory.listFiles(IMAGE_FILTER))
-                        .map(FlightService::createImageObject)
-                        .toList();
-        }
-
-        return Collections.emptyList();
-    }
-
-    private static File getScreenshotsFromStorage(Flight flight) {
-        final String screenshotDirectory =
-                FileUtil.getApplicationDataPath() + "/screenshots/" + flight.getId();
-
-        return new File(screenshotDirectory);
-    }
-
-    private static Image createImageObject(File file) {
-        try {
-            return new Image(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

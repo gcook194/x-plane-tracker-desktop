@@ -68,7 +68,9 @@ public class SettingsDaoJDBC {
             return new ApplicationSettingsDTO(
                     simbriefUsername,
                     xPlaneHost,
-                    useSimbriefApi
+                    useSimbriefApi,
+                    true, // TODO add a migration and a UI element for this
+                    "E:/Steam/userdata/125502440/760/remote/2014780/screenshots" // TODO add a migration and a UI element for this
             );
         } catch (SQLException e) {
             logger.error("Could not get settings from database from database", e);

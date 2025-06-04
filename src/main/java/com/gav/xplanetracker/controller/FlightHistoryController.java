@@ -5,10 +5,7 @@ import com.gav.xplanetracker.enums.FlightEventType;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.model.MapOptions;
-import com.gav.xplanetracker.service.ChartService;
-import com.gav.xplanetracker.service.FlightService;
-import com.gav.xplanetracker.service.MapService;
-import com.gav.xplanetracker.service.NavigraphService;
+import com.gav.xplanetracker.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -35,6 +32,7 @@ public class FlightHistoryController {
     private final MapService mapService;
     private final NavigraphService navigraphService;
     private final ChartService chartService;
+    private final ScreenshotService screenshotService;
 
     final WebView webView;
 
@@ -45,6 +43,7 @@ public class FlightHistoryController {
         this.mapService = MapService.getInstance();
         this.navigraphService = NavigraphService.getInstance();
         this.chartService = ChartService.getInstance();
+        this.screenshotService = ScreenshotService.getInstance();
 
         this.webView = new WebView();
         this.simbriefWebView = new WebView();
@@ -117,14 +116,14 @@ public class FlightHistoryController {
                 if (empty || flight == null) {
                     setText(null);
                 } else {
-                   final String completedAt = Optional.ofNullable(flight.getCompletedAt())
-                           .map(completed -> {
-                               final LocalDateTime ldt = LocalDateTime.ofInstant(flight.getCompletedAt(), ZoneOffset.UTC);
-                               return ldt.format(DateTimeFormatter.ofPattern("dd MMM yy"));
-                           })
-                           .orElse("N/A");
+                    final String completedAt = Optional.ofNullable(flight.getCompletedAt())
+                            .map(completed -> {
+                                final LocalDateTime ldt = LocalDateTime.ofInstant(flight.getCompletedAt(), ZoneOffset.UTC);
+                                return ldt.format(DateTimeFormatter.ofPattern("dd MMM yy"));
+                            })
+                            .orElse("N/A");
 
-                    setText(String.format(
+                    final String output = String.format(
                             "%s\t\t%s - %s\t\t%s\t%s\t\t%s",
                             flight.getFlightNumberIcao(),
                             flight.getDepartureAirportIcao(),
@@ -132,7 +131,10 @@ public class FlightHistoryController {
                             flight.getAircraftReg(),
                             flight.getAircraftTypeIcao(),
                             completedAt
-                    ));
+                    );
+
+                    System.out.println(output);
+                    setText(output);
                 }
             }
         });
@@ -159,12 +161,12 @@ public class FlightHistoryController {
         simbriefWebView.prefWidthProperty().bind(flightInfoPanel.widthProperty());
         simbriefWebView.prefHeightProperty().bind(flightInfoPanel.heightProperty());
 
-        flightImage.fitWidthProperty().bind(flightInfoPanel.widthProperty().multiply(0.75));
+        flightImage.fitWidthProperty().bind(flightInfoPanel.widthProperty().multiply(0.5));
     }
 
     private void loadFlightDetails(Flight flight) {
         final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
-        final List<Image> images = flightService.getScreenshots(flight);
+        final List<Image> images = screenshotService.getScreenshots(flight);
 
         // Flight screenshot
         flightImage.setImage(null);

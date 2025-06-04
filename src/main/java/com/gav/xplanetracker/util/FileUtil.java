@@ -23,8 +23,7 @@ public class FileUtil {
         } else if (os.toLowerCase().contains("win")) {
             return Paths.get(
                     System.getenv("APPDATA"),
-                    "x-plane-tracker",
-                    "flights.db"
+                    "x-plane-tracker"
             ).toString();
         }
 
