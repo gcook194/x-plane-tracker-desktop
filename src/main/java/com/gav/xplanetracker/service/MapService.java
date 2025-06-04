@@ -88,6 +88,20 @@ public class MapService {
         return IntlDateLineOffset.NONE;
     }
 
+    public void drawBasicMap(WebView webView, Pane mapPanel) {
+        final WebEngine webEngine = webView.getEngine();
+        webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
+
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                webEngine.executeScript("loadMap();");
+            }
+        });
+
+        mapPanel.getChildren().clear();
+        mapPanel.getChildren().add(webView);
+    }
+
     public void drawFlightRouteMap(WebView webView, Pane mapPanel, List<FlightEvent> flightEvents, MapOptions mapOptions) {
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
