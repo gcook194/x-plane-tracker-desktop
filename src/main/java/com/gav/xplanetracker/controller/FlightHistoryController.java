@@ -12,11 +12,12 @@ import com.gav.xplanetracker.service.NavigraphService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,33 @@ public class FlightHistoryController {
     private VBox flightAltitudePanel;
 
     @FXML
+    private Label aircraftType;
+
+    @FXML
+    private Label aircraftReg;
+
+    @FXML
+    private VBox flightDetailsBox;
+
+    @FXML
+    private Label flightRoute;
+
+    @FXML
+    private Label flightCodeLabel;
+
+    @FXML
+    private Label routeLabel;
+
+    @FXML
+    private Label fullRouteLabel;
+
+    @FXML
+    private VBox flightInfoBox;
+
+    @FXML
+    private ImageView flightImage;
+
+    @FXML
     public void initialize() {
         final ObservableList<Flight> flightObservableList =
                 FXCollections.observableArrayList(flightService.getFlights());
@@ -131,12 +159,22 @@ public class FlightHistoryController {
 
         simbriefWebView.prefWidthProperty().bind(flightInfoPanel.widthProperty());
         simbriefWebView.prefHeightProperty().bind(flightInfoPanel.heightProperty());
+
+        flightImage.fitWidthProperty().bind(flightInfoPanel.widthProperty().multiply(0.75));
     }
 
     private void loadFlightDetails(Flight flight) {
         final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
+        final List<Image> images = flightService.getScreenshots(flight);
+
+        // Flight screenshot
+        flightImage.setImage(null);
+        if (!images.isEmpty()) {
+            flightImage.setImage(images.getFirst());
+        }
 
         // Flight information
+        loadFlightInfo(flight);
 
         // simbrief route
         if (flight.getNavigraphJson() != null) {
@@ -161,5 +199,32 @@ public class FlightHistoryController {
 
         chartService.drawLineGraph(flightAltitudePanel, flightEvents, FlightEventType.DENSITY_ALTITUDE);
         chartService.drawLineGraph(flightSpeedPanel, flightEvents, FlightEventType.GROUND_SPEED);
+    }
+
+    private void loadFlightInfo(Flight flight) {
+        aircraftType.setText(flight.getAircraftTypeIcao());
+        aircraftReg.setText(flight.getAircraftReg());
+        flightCodeLabel.setText(flight.getFlightNumberIcao());
+        routeLabel.setText(
+                String.format("%s -> %s", flight.getDepartureAirportIcao(), flight.getArrivalAirportIcao())
+        );
+
+        if (flight.getNavigraphJson() != null) {
+            final NavigraphFlightPlan flightPlan = navigraphService.getFlightPlan(flight);
+            flightRoute.setText(flightPlan.getRoute());
+            fullRouteLabel.setText(
+                    String.format(
+                            "%s to %s",
+                            flightPlan.getDeparture().getName(),
+                            flightPlan.getArrival().getName()
+                    )
+            );
+        }
+
+        flightDetailsBox.setVisible(true);
+        flightDetailsBox.setManaged(true);
+
+        flightInfoBox.setVisible(true);
+        flightInfoBox.setManaged(true);
     }
 }

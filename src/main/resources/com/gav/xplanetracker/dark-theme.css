@@ -250,4 +250,8 @@
     -fx-background-color: #3498db;
     -fx-text-fill: #ffffff;
 }
+
+.padded {
+    -fx-padding: 10;
+}
 ``
