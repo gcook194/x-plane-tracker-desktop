@@ -254,4 +254,49 @@
 .padded {
     -fx-padding: 10;
 }
+
+.flight-cell {
+    -fx-padding: 8;
+    -fx-background-color: transparent;
+}
+
+.flight-number {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.flight-route {
+    -fx-text-fill: #bbbbbb;
+    -fx-font-size: 12px;
+}
+
+.aircraft-info {
+    -fx-text-fill: #999999;
+    -fx-font-size: 11px;
+}
+
+.completed-date {
+    -fx-text-fill: #666666;
+    -fx-font-size: 11px;
+}
+
+.list-cell:filled:selected .flight-cell {
+    -fx-background-color: #3498db;
+}
+
+.list-cell:filled:selected .flight-number,
+.list-cell:filled:selected .flight-route,
+.list-cell:filled:selected .aircraft-info,
+.list-cell:filled:selected .completed-date {
+    -fx-text-fill: white;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
 ``

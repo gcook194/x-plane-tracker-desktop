@@ -9,10 +9,13 @@ import com.gav.xplanetracker.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
@@ -114,30 +117,40 @@ public class FlightHistoryController {
             protected void updateItem(Flight flight, boolean empty) {
                 super.updateItem(flight, empty);
                 if (empty || flight == null) {
-                    setText(null);
+                    setGraphic(null);
                 } else {
                     final String completedAt = Optional.ofNullable(flight.getCompletedAt())
                             .map(completed -> {
-                                final LocalDateTime ldt = LocalDateTime.ofInstant(flight.getCompletedAt(), ZoneOffset.UTC);
+                                final LocalDateTime ldt = LocalDateTime.ofInstant(completed, ZoneOffset.UTC);
                                 return ldt.format(DateTimeFormatter.ofPattern("dd MMM yy"));
                             })
                             .orElse("N/A");
 
-                    final String output = String.format(
-                            "%s\t\t%s - %s\t\t%s\t%s\t\t%s",
-                            flight.getFlightNumberIcao(),
-                            flight.getDepartureAirportIcao(),
-                            flight.getArrivalAirportIcao(),
-                            flight.getAircraftReg(),
-                            flight.getAircraftTypeIcao(),
-                            completedAt
-                    );
+                    Label flightNumberLabel = new Label(flight.getFlightNumberIcao());
+                    flightNumberLabel.getStyleClass().add("flight-number");
 
-                    System.out.println(output);
-                    setText(output);
+                    Label completedAtLabel = new Label(completedAt);
+                    completedAtLabel.getStyleClass().add("completed-date");
+
+                    HBox topRow = new HBox(flightNumberLabel, new Region(), completedAtLabel);
+                    HBox.setHgrow(topRow.getChildren().get(1), Priority.ALWAYS); // Spacer
+                    topRow.setAlignment(Pos.CENTER_LEFT);
+
+                    Label routeLabel = new Label(flight.getDepartureAirportIcao() + " → " + flight.getArrivalAirportIcao());
+                    routeLabel.getStyleClass().add("flight-route");
+
+                    Label aircraftLabel = new Label(flight.getAircraftReg() + " (" + flight.getAircraftTypeIcao() + ")");
+                    aircraftLabel.getStyleClass().add("aircraft-info");
+
+                    VBox cellLayout = new VBox(topRow, routeLabel, aircraftLabel);
+                    cellLayout.setSpacing(4);
+                    cellLayout.getStyleClass().add("flight-cell");
+
+                    setGraphic(cellLayout);
                 }
             }
         });
+
 
         flightHistoryList.getSelectionModel()
                 .selectedItemProperty()
