@@ -46,6 +46,7 @@ public class SettingsController {
         final ApplicationSettingsDTO settings = settingsService.getSettings();
         simbriefUsernameField.setText(settings.simbriefUsername());
         xplaneUriField.setText(settings.xplaneHost());
+        screenshotDirectoryField.setText(settings.xPlaneScreenshotDirectory());
 
         final ToggleGroup navigraphToggleGroup = new ToggleGroup();
         navigraphNo.setToggleGroup(navigraphToggleGroup);

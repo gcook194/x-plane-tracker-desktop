@@ -87,7 +87,7 @@ public class SettingsDaoJDBC {
                             "use_navigraph_api = ?, " +
                             "x_plane_host = ?, " +
                             "monitor_screenshots = ?, " +
-                            "screenshot_dir = ?";
+                            "screenshot_directory = ?";
 
         try (Connection connection = DatabaseConnection.connect()) {
             final PreparedStatement ps = connection.prepareStatement(SQL);
@@ -99,9 +99,7 @@ public class SettingsDaoJDBC {
 
             ps.executeUpdate();
         } catch (SQLException e) {
-            logger.error("Could not update settings from database from database", e);
-
-            throw new SettingsPropertyNotFoundException("Could not get Simbrief username from database");
+            logger.error("Could not update settings", e);
         }
     }
 }

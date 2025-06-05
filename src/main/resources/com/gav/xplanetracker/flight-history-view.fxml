@@ -34,7 +34,7 @@
                                       styleClass="flight-details-container">
 
                                     <!-- Flight Image -->
-                                    <StackPane alignment="CENTER" styleClass="image-container" visible="true" managed="true">
+                                    <StackPane fx:id="flightImagePane" styleClass="image-container" visible="false" managed="false">
                                         <ImageView fx:id="flightImage" preserveRatio="true" fitWidth="600"/>
                                     </StackPane>
 
@@ -79,6 +79,13 @@
                                             <VBox spacing="3" alignment="CENTER_LEFT">
                                                 <Label text="Block Time" styleClass="label-title"/>
                                                 <Label fx:id="flightDuration" styleClass="label-value"/>
+                                            </VBox>
+                                        </HBox>
+
+                                        <HBox spacing="40" alignment="CENTER">
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Distance (NM)" styleClass="label-title"/>
+                                                <Label fx:id="flightDistance" styleClass="label-value"/>
                                             </VBox>
                                         </HBox>
 

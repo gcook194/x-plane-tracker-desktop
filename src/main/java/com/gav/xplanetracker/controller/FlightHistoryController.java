@@ -13,10 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,10 +107,16 @@ public class FlightHistoryController {
     private Label arrivalTime;
 
     @FXML
+    private Label flightDistance;
+
+    @FXML
     private VBox flightInfoBox;
 
     @FXML
     private ImageView flightImage;
+
+    @FXML
+    private StackPane flightImagePane;
 
     @FXML
     public void initialize() {
@@ -193,13 +196,9 @@ public class FlightHistoryController {
 
     private void loadFlightDetails(Flight flight) {
         final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
-        final List<Image> images = screenshotService.getScreenshots(flight);
 
         // Flight screenshot
-        flightImage.setImage(null);
-        if (!images.isEmpty()) {
-            flightImage.setImage(images.getFirst());
-        }
+        loadHeroImage(flight);
 
         // Flight information
         loadFlightInfo(flight);
@@ -248,6 +247,7 @@ public class FlightHistoryController {
 
         if (flight.getNavigraphJson() != null) {
             final NavigraphFlightPlan flightPlan = navigraphService.getFlightPlan(flight);
+            final int distance = navigraphService.getPlannedFlightDistance(flightPlan);
             flightRoute.setText(flightPlan.getRoute());
             fullRouteLabel.setText(
                     String.format(
@@ -256,6 +256,7 @@ public class FlightHistoryController {
                             flightPlan.getArrival().getName()
                     )
             );
+            flightDistance.setText(Integer.toString(distance));
         }
 
         flightDetailsBox.setVisible(true);
@@ -263,5 +264,20 @@ public class FlightHistoryController {
 
         flightInfoBox.setVisible(true);
         flightInfoBox.setManaged(true);
+    }
+
+    private void loadHeroImage(Flight flight) {
+        final List<Image> images = screenshotService.getScreenshots(flight);
+
+        flightImagePane.setVisible(false);
+        flightImagePane.setManaged(false);
+        flightImage.setImage(null);
+
+        if (!images.isEmpty()) {
+            flightImage.setImage(images.getFirst());
+
+            flightImagePane.setVisible(true);
+            flightImagePane.setManaged(true);
+        }
     }
 }
