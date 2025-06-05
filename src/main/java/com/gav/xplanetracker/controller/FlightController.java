@@ -30,7 +30,6 @@ public class FlightController {
     private final MapService mapService;
     private final ChartService chartService;
 
-    private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
     final WebView navigraphWebView;
 
@@ -125,8 +124,6 @@ public class FlightController {
     public void initialize() {
         handleSimulatorState();
 
-        navigraphFlightPlan = navigraphService.getFlightPlan();
-
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
@@ -150,6 +147,7 @@ public class FlightController {
         final Task<Flight> loadFlightDataTask = new Task<>() {
             @Override
             protected Flight call() {
+                final NavigraphFlightPlan navigraphFlightPlan = navigraphService.getFlightPlan();
                 return flightService.getOrCreateCurrentFlight(navigraphFlightPlan);
             }
 
@@ -253,6 +251,8 @@ public class FlightController {
     }
 
     private void activeFlightView(Flight flight) {
+        final NavigraphFlightPlan navigraphFlightPlan = navigraphService.getFlightPlan(flight);
+
         loadingBox.setVisible(false);
         loadingBox.setManaged(false);
 
