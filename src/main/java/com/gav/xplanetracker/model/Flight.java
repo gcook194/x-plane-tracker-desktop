@@ -2,6 +2,7 @@ package com.gav.xplanetracker.model;
 
 import com.gav.xplanetracker.enums.FlightStatus;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

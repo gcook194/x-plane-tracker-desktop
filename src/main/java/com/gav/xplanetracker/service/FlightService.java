@@ -11,7 +11,10 @@ import com.gav.xplanetracker.model.FlightEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FlightService {
@@ -105,5 +108,51 @@ public class FlightService {
 
     public List<Flight> getFlights() {
         return flightDao.getFlightsByStatus(FlightStatus.COMPLETED);
+    }
+
+    public String getOffBlockTime(Flight flight) {
+        return this.getFlightEvents(flight).stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .findFirst()
+                .map(event -> {
+                    final DateTimeFormatter zuluFormatter = DateTimeFormatter.ofPattern("HH:mm'Z'")
+                            .withZone(ZoneOffset.UTC);
+
+                    return zuluFormatter.format(event.getCreatedAt());
+                })
+                .orElse("N/A");
+    }
+
+    public String getArrivalTime(Flight flight) {
+        return this.getFlightEvents(flight).stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .reduce((first, second) -> second)
+                .map(event -> {
+                    final DateTimeFormatter zuluFormatter = DateTimeFormatter.ofPattern("HH:mm'Z'")
+                            .withZone(ZoneOffset.UTC);
+
+                    return zuluFormatter.format(event.getCreatedAt());
+                })
+                .orElse("N/A");
+    }
+
+    public String getBlockTime(Flight flight) {
+        final List<FlightEvent> events = this.getFlightEvents(flight);
+
+        final Instant offBlocksTime = events.stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .findFirst()
+                .map(FlightEvent::getCreatedAt)
+                .orElseThrow(() -> new IllegalArgumentException("No engines started events"));
+
+        final Instant onBlocksTime = events.stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .reduce((first, second) -> second)
+                .map(FlightEvent::getCreatedAt)
+                .orElseThrow(() -> new IllegalArgumentException("No engines stopped events"));
+
+        final Duration duration = Duration.between(offBlocksTime, onBlocksTime);
+
+        return String.format("%s:%s", duration.toHoursPart(), duration.toMinutesPart());
     }
 }

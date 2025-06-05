@@ -101,6 +101,15 @@ public class FlightHistoryController {
     private Label fullRouteLabel;
 
     @FXML
+    private Label flightDuration;
+
+    @FXML
+    private Label offBlockTime;
+
+    @FXML
+    private Label arrivalTime;
+
+    @FXML
     private VBox flightInfoBox;
 
     @FXML
@@ -227,6 +236,15 @@ public class FlightHistoryController {
         routeLabel.setText(
                 String.format("%s -> %s", flight.getDepartureAirportIcao(), flight.getArrivalAirportIcao())
         );
+
+        final String blockTime = flightService.getBlockTime(flight);
+        flightDuration.setText(blockTime);
+
+        final String offBlockTimeStr = flightService.getOffBlockTime(flight);
+        offBlockTime.setText(offBlockTimeStr);
+
+        final String arrivalTimeStr = flightService.getArrivalTime(flight);
+        arrivalTime.setText(arrivalTimeStr);
 
         if (flight.getNavigraphJson() != null) {
             final NavigraphFlightPlan flightPlan = navigraphService.getFlightPlan(flight);
