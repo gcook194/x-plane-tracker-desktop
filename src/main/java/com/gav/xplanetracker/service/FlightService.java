@@ -8,12 +8,9 @@ import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightStatus;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
-import com.gav.xplanetracker.util.FileUtil;
-import javafx.scene.image.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.time.Instant;
 import java.util.*;
 

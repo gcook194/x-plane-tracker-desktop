@@ -28,6 +28,28 @@
                     </VBox>
 
                     <VBox spacing="8">
+                        <Label text="Monitor Screenshots?" styleClass="label-title"/>
+                        <HBox spacing="20">
+                            <RadioButton fx:id="screenshotsYes" text="Yes" style="-fx-text-fill: white;">
+                                <toggleGroup>
+                                    <ToggleGroup/>
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton fx:id="screenshotsNo" text="No" style="-fx-text-fill: white;">
+                                <toggleGroup>
+                                    <ToggleGroup/>
+                                </toggleGroup>
+                            </RadioButton>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="8">
+                        <Label text="Screenshot Directory" styleClass="label-title"/>
+                        <TextField fx:id="screenshotDirectoryField"
+                                   style="-fx-background-color: #3a3a3a; -fx-text-fill: white;"/>
+                    </VBox>
+
+                    <VBox spacing="8">
                         <Label text="Use Navigraph API?" styleClass="label-title"/>
                         <HBox spacing="20">
                             <RadioButton fx:id="navigraphYes" text="Yes" style="-fx-text-fill: white;">

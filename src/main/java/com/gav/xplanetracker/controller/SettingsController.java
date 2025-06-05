@@ -33,6 +33,15 @@ public class SettingsController {
     protected Button saveButton;
 
     @FXML
+    protected RadioButton screenshotsYes;
+
+    @FXML
+    protected RadioButton screenshotsNo;
+
+    @FXML
+    protected TextField screenshotDirectoryField;
+
+    @FXML
     public void initialize() {
         final ApplicationSettingsDTO settings = settingsService.getSettings();
         simbriefUsernameField.setText(settings.simbriefUsername());
@@ -49,6 +58,18 @@ public class SettingsController {
             navigraphYes.setSelected(false);
             navigraphNo.setSelected(true);
         }
+
+        final ToggleGroup screenshotsToggleGroup = new ToggleGroup();
+        screenshotsYes.setToggleGroup(screenshotsToggleGroup);
+        screenshotsNo.setToggleGroup(screenshotsToggleGroup);
+
+        if (settings.monitorScreenshots()) {
+            screenshotsYes.setSelected(true);
+            screenshotsNo.setSelected(false);
+        } else {
+            screenshotsYes.setSelected(false);
+            screenshotsNo.setSelected(true);
+        }
     }
 
     @FXML
@@ -56,6 +77,8 @@ public class SettingsController {
         final String simbriefUsername = simbriefUsernameField.getText();
         final String xplaneUri = xplaneUriField.getText();
         final boolean useNavigraph = navigraphYes.isSelected();
+        final boolean monitorScreenshots = screenshotsYes.isSelected();
+        final String screenshotDirectory = screenshotDirectoryField.getText();
 
         //TODO add validation
 
@@ -63,8 +86,8 @@ public class SettingsController {
                 simbriefUsername,
                 xplaneUri,
                 useNavigraph,
-                true, // TODO add a migration and a UI element for this
-                "E:/Steam/userdata/125502440/760/remote/2014780/screenshots" // TODO add a migration and a UI element for this
+                monitorScreenshots,
+                screenshotDirectory
         );
 
         settingsService.save(settings);
