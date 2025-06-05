@@ -119,33 +119,7 @@ public class FlightHistoryController {
                 if (empty || flight == null) {
                     setGraphic(null);
                 } else {
-                    final String completedAt = Optional.ofNullable(flight.getCompletedAt())
-                            .map(completed -> {
-                                final LocalDateTime ldt = LocalDateTime.ofInstant(completed, ZoneOffset.UTC);
-                                return ldt.format(DateTimeFormatter.ofPattern("dd MMM yy"));
-                            })
-                            .orElse("N/A");
-
-                    Label flightNumberLabel = new Label(flight.getFlightNumberIcao());
-                    flightNumberLabel.getStyleClass().add("flight-number");
-
-                    Label completedAtLabel = new Label(completedAt);
-                    completedAtLabel.getStyleClass().add("completed-date");
-
-                    HBox topRow = new HBox(flightNumberLabel, new Region(), completedAtLabel);
-                    HBox.setHgrow(topRow.getChildren().get(1), Priority.ALWAYS); // Spacer
-                    topRow.setAlignment(Pos.CENTER_LEFT);
-
-                    Label routeLabel = new Label(flight.getDepartureAirportIcao() + " → " + flight.getArrivalAirportIcao());
-                    routeLabel.getStyleClass().add("flight-route");
-
-                    Label aircraftLabel = new Label(flight.getAircraftReg() + " (" + flight.getAircraftTypeIcao() + ")");
-                    aircraftLabel.getStyleClass().add("aircraft-info");
-
-                    VBox cellLayout = new VBox(topRow, routeLabel, aircraftLabel);
-                    cellLayout.setSpacing(4);
-                    cellLayout.getStyleClass().add("flight-cell");
-
+                    final VBox cellLayout = flightDetailsListItem(flight);
                     setGraphic(cellLayout);
                 }
             }
@@ -175,6 +149,37 @@ public class FlightHistoryController {
         simbriefWebView.prefHeightProperty().bind(flightInfoPanel.heightProperty());
 
         flightImage.fitWidthProperty().bind(flightInfoPanel.widthProperty().multiply(0.5));
+    }
+
+    private static VBox flightDetailsListItem(Flight flight) {
+        final String completedAt = Optional.ofNullable(flight.getCompletedAt())
+                .map(completed -> {
+                    final LocalDateTime ldt = LocalDateTime.ofInstant(completed, ZoneOffset.UTC);
+                    return ldt.format(DateTimeFormatter.ofPattern("dd MMM yy"));
+                })
+                .orElse("N/A");
+
+        final Label flightNumberLabel = new Label(flight.getFlightNumberIcao());
+        flightNumberLabel.getStyleClass().add("flight-number");
+
+        final Label completedAtLabel = new Label(completedAt);
+        completedAtLabel.getStyleClass().add("completed-date");
+
+        final HBox topRow = new HBox(flightNumberLabel, new Region(), completedAtLabel);
+        HBox.setHgrow(topRow.getChildren().get(1), Priority.ALWAYS);
+        topRow.setAlignment(Pos.CENTER_LEFT);
+
+        final Label routeLabel = new Label(flight.getDepartureAirportIcao() + " → " + flight.getArrivalAirportIcao());
+        routeLabel.getStyleClass().add("flight-route");
+
+        final Label aircraftLabel = new Label(flight.getAircraftReg() + " (" + flight.getAircraftTypeIcao() + ")");
+        aircraftLabel.getStyleClass().add("aircraft-info");
+
+        final VBox cellLayout = new VBox(topRow, routeLabel, aircraftLabel);
+        cellLayout.setSpacing(4);
+        cellLayout.getStyleClass().add("flight-cell");
+
+        return cellLayout;
     }
 
     private void loadFlightDetails(Flight flight) {
