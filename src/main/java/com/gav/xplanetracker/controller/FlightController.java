@@ -3,18 +3,16 @@ package com.gav.xplanetracker.controller;
 import com.gav.xplanetracker.dto.ApplicationSettingsDTO;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.enums.FlightEventType;
-import com.gav.xplanetracker.enums.IntlDateLineOffset;
 import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
+import com.gav.xplanetracker.model.MapOptions;
 import com.gav.xplanetracker.service.*;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +28,13 @@ public class FlightController {
     private final XPlaneService xPlaneService;
     private final SettingsService settingsService;
     private final MapService mapService;
+    private final ChartService chartService;
 
     private NavigraphFlightPlan navigraphFlightPlan;
     final WebView webView;
-    final WebEngine webEngine;
-
     final WebView navigraphWebView;
-    final WebEngine navigraphWebEngine;
+
+    final MapOptions actualRouteMapOptions;
 
     public FlightController() {
         this.flightService = FlightService.getInstance();
@@ -44,12 +42,14 @@ public class FlightController {
         this.xPlaneService = XPlaneService.getInstance();
         this.settingsService = SettingsService.getInstance();
         this.mapService = MapService.getInstance();
+        this.chartService = ChartService.getInstance();
 
         this.webView = new WebView();
-        this.webEngine = webView.getEngine();
-
         this.navigraphWebView = new WebView();
-        this.navigraphWebEngine = navigraphWebView.getEngine();
+
+        this.actualRouteMapOptions = new MapOptions()
+                .setShowAircraftOnMap(true)
+                .setShowDepartureArrival(false);
     }
 
     @FXML
@@ -130,6 +130,12 @@ public class FlightController {
         leftPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(1.0 / 3));
         mapPanel.prefWidthProperty().bind(rootBox.widthProperty().multiply(2.0 / 3));
 
+        webView.prefWidthProperty().bind(mapPanel.widthProperty());
+        webView.prefHeightProperty().bind(mapPanel.heightProperty());
+
+        navigraphWebView.prefWidthProperty().bind(mapPanel.widthProperty());
+        navigraphWebView.prefHeightProperty().bind(mapPanel.heightProperty());
+
         flightService.getActiveFlight().ifPresentOrElse(
                 this::activeFlightView,
                 this::noActiveFlightView
@@ -164,6 +170,7 @@ public class FlightController {
         new Thread(loadFlightDataTask).start();
     }
 
+    // TODO cancel and complete methods are very similar
     @FXML
     protected void onStopFlightClick() {
         flightService.completeActiveFlight();
@@ -204,7 +211,10 @@ public class FlightController {
     private void onActiveFlightProgressTabSelected() {
         logger.debug("refreshing active flight progress tab");
         flightService.getActiveFlight()
-                .ifPresent(this::loadMap);
+                .ifPresent(flight -> {
+                    final List<FlightEvent> events = flightService.getFlightEvents(flight);
+                    mapService.drawFlightRouteMap(webView, activeFlightMapPanel, events, actualRouteMapOptions);
+                });
     }
 
     @FXML
@@ -212,77 +222,6 @@ public class FlightController {
         logger.debug("refreshing active flight data graphs");
         flightService.getActiveFlight()
                 .ifPresent(this::loadFlightData);
-    }
-
-    private void loadNavigraphMap(Flight flight) {
-        navigraphWebEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
-
-        navigraphWebEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                navigraphWebEngine.executeScript("loadMap();");
-
-                if (flight != null) {
-                    final IntlDateLineOffset idlLongitudeOffset = mapService.getIntlDateLineOffset(navigraphFlightPlan);
-
-                    mapService.addMarker(
-                            navigraphWebEngine,
-                            navigraphFlightPlan.getDeparture().getLatitude(),
-                            navigraphFlightPlan.getDeparture().getLongitude(),
-                            navigraphFlightPlan.getDeparture().getName(),
-                            idlLongitudeOffset
-                    );
-
-                    navigraphFlightPlan.getWaypoints().forEach(waypoint -> {
-                        mapService.addMarker(
-                                navigraphWebEngine,
-                                waypoint.getLatitude(),
-                                waypoint.getLongitude(),
-                                waypoint.getName(),
-                                idlLongitudeOffset
-                        );
-
-                        logger.debug("[{}, {}]", waypoint.getLatitude(), waypoint.getLongitude());
-                    });
-
-                    mapService.addMarker(
-                            navigraphWebEngine,
-                            navigraphFlightPlan.getArrival().getLatitude(),
-                            navigraphFlightPlan.getArrival().getLongitude(),
-                            navigraphFlightPlan.getArrival().getName(),
-                            idlLongitudeOffset
-                    );
-
-                    navigraphWebEngine.executeScript("drawBasicRouteLine();");
-                    navigraphWebEngine.executeScript("fitToAllMarkers();");
-                }
-            }
-        });
-
-        navigraphWebView.prefWidthProperty().bind(mapPanel.widthProperty());
-        navigraphWebView.prefHeightProperty().bind(mapPanel.heightProperty());
-
-        navigraphMapPanel.getChildren().clear();
-        navigraphMapPanel.getChildren().add(navigraphWebView);
-    }
-
-    private void loadMap(Flight flight) {
-        webEngine.load(getClass().getResource("/web/map/map.html").toExternalForm());
-
-        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                webEngine.executeScript("loadMap();");
-                if (flight != null) {
-                    final List<FlightEvent> flightEvents = flightService.getFlightEvents(flight);
-                    mapService.drawActualRoute(webEngine, flightEvents);
-                }
-            }
-        });
-
-        webView.prefWidthProperty().bind(mapPanel.widthProperty());
-        webView.prefHeightProperty().bind(mapPanel.heightProperty());
-
-        activeFlightMapPanel.getChildren().clear();
-        activeFlightMapPanel.getChildren().add(webView);
     }
 
     //TODO this could probably be done as a single HBox and label but I am too stupid
@@ -308,8 +247,8 @@ public class FlightController {
         if (flight != null) {
             final List<FlightEvent> events = flightService.getFlightEvents(flight);
 
-            mapService.drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
-            mapService.drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
+            chartService.drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
+            chartService.drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
         }
     }
 
@@ -347,14 +286,16 @@ public class FlightController {
                 )
         );
 
-        loadNavigraphMap(flight);
-        loadMap(flight);
+        mapService.drawSimbriefMap(navigraphWebView, navigraphMapPanel, navigraphFlightPlan);
+
+        final List<FlightEvent> events = flightService.getFlightEvents(flight);
+        mapService.drawFlightRouteMap(webView, activeFlightMapPanel, events, actualRouteMapOptions);
         loadFlightData(flight);
     }
 
     private void noActiveFlightView() {
-        loadMap(null);
-        loadNavigraphMap(null);
+        mapService.drawBasicMap(webView, activeFlightMapPanel);
+        mapService.drawBasicMap(navigraphWebView, navigraphMapPanel);
         loadFlightData(null);
     }
 }

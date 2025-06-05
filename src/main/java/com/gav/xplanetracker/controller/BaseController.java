@@ -24,9 +24,13 @@ public class BaseController {
     private Button dashboardButton;
 
     @FXML
+    private Button flightsButton;
+
+    @FXML
     public void initialize() {
         settingsButton.setOnAction(event -> loadView("/com/gav/xplanetracker/settings-view.fxml"));
         dashboardButton.setOnAction(event -> loadView("/com/gav/xplanetracker/start-flight-view.fxml"));
+        flightsButton.setOnAction(event -> loadView("/com/gav/xplanetracker/flight-history-view.fxml"));
 
         loadView("/com/gav/xplanetracker/start-flight-view.fxml");
     }

@@ -3,8 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import java.net.URL?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.gav.xplanetracker.controller.SettingsController">
@@ -26,6 +24,28 @@
                     <VBox spacing="8">
                         <Label text="X-Plane Host" styleClass="label-title"/>
                         <TextField fx:id="xplaneUriField"
+                                   style="-fx-background-color: #3a3a3a; -fx-text-fill: white;"/>
+                    </VBox>
+
+                    <VBox spacing="8">
+                        <Label text="Monitor Screenshots?" styleClass="label-title"/>
+                        <HBox spacing="20">
+                            <RadioButton fx:id="screenshotsYes" text="Yes" style="-fx-text-fill: white;">
+                                <toggleGroup>
+                                    <ToggleGroup/>
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton fx:id="screenshotsNo" text="No" style="-fx-text-fill: white;">
+                                <toggleGroup>
+                                    <ToggleGroup/>
+                                </toggleGroup>
+                            </RadioButton>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="8">
+                        <Label text="Screenshot Directory" styleClass="label-title"/>
+                        <TextField fx:id="screenshotDirectoryField"
                                    style="-fx-background-color: #3a3a3a; -fx-text-fill: white;"/>
                     </VBox>
 

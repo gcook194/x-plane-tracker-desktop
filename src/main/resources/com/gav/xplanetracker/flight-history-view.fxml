@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.gav.xplanetracker.controller.FlightHistoryController">
+    <center>
+        <StackPane>
+            <HBox fx:id="rootBox">
+
+                <!-- Left Panel (1/3 width - Flight list) -->
+                <VBox fx:id="leftPanel" styleClass="side-panel" maxWidth="Infinity">
+                    <ListView fx:id="flightHistoryList"
+                              styleClass="flight-list"
+                              VBox.vgrow="ALWAYS">
+
+                    </ListView>
+                </VBox>
+
+                <!-- Right Panel (2/3 width - Flight Details) -->
+                <VBox fx:id="flightInfoPanel" styleClass="map-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" xmlns:fx="http://javafx.com/fxml">
+                    <TabPane fx:id="flightDetailsPane" tabClosingPolicy="UNAVAILABLE" visible="false" managed="false">
+                        <Tab text="Details">
+                            <AnchorPane>
+                                <VBox AnchorPane.topAnchor="0.0"
+                                      AnchorPane.bottomAnchor="0.0"
+                                      AnchorPane.leftAnchor="0.0"
+                                      AnchorPane.rightAnchor="0.0"
+                                      alignment="TOP_CENTER"
+                                      spacing="10"
+                                      styleClass="padded">
+
+                                    <VBox alignment="CENTER">
+                                        <ImageView fx:id="flightImage"
+                                                   preserveRatio="true"
+                                        />
+                                    </VBox>
+                                    <VBox fx:id="flightInfoBox"
+                                          alignment="CENTER"
+                                          spacing="5"
+                                          styleClass="flight-info-box"
+                                          visible="false"
+                                          managed="false">
+                                        <Label fx:id="flightCodeLabel" styleClass="flight-code"/>
+                                        <Label fx:id="routeLabel" styleClass="route-code"/>
+                                        <Label fx:id="fullRouteLabel" styleClass="full-route"/>
+                                    </VBox>
+
+                                    <VBox fx:id="flightDetailsBox"
+                                          alignment="CENTER"
+                                          visible="false"
+                                          managed="false"
+                                          spacing="20">
+
+                                        <HBox spacing="40" alignment="CENTER">
+                                            <VBox spacing="5" alignment="CENTER">
+                                                <Label text="Aircraft Type" styleClass="label-title"/>
+                                                <Label fx:id="aircraftType" styleClass="label-value"/>
+                                            </VBox>
+
+                                            <VBox spacing="5" alignment="CENTER">
+                                                <Label text="Aircraft Reg" styleClass="label-title"/>
+                                                <Label fx:id="aircraftReg" styleClass="label-value"/>
+                                            </VBox>
+                                        </HBox>
+
+                                        <VBox spacing="5" alignment="CENTER">
+                                            <Label text="Route" styleClass="label-title"/>
+                                            <Label fx:id="flightRoute" styleClass="label-value" wrapText="true" />
+                                        </VBox>
+                                    </VBox>
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                        <Tab text="Flight Plan">
+                            <AnchorPane>
+                                <VBox fx:id="simbriefRoutePanel">
+                                    <!-- populated with web view -->
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                        <Tab text="Route">
+                            <AnchorPane>
+                                <VBox fx:id="flightMapPanel">
+                                    <!-- populated with web view -->
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                        <Tab text="Flight Data">
+                            <AnchorPane>
+                                <VBox fx:id="chartsContainer"
+                                      AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                      spacing="10">
+                                    <VBox fx:id="flightSpeedPanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
+
+                                    <VBox fx:id="flightAltitudePanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
+                                </VBox>
+                            </AnchorPane>
+                        </Tab>
+                    </TabPane>
+                </VBox>
+            </HBox>
+        </StackPane>
+    </center>
+</BorderPane>

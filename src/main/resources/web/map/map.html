@@ -102,15 +102,13 @@
         L.marker(latLong, { icon: planeIcon }).addTo(map);
     }
 
-    function drawActualRouteLine(latLongs, heading) {
+    function drawActualRouteLine(latLongs) {
         const flightPath = L.polyline(latLongs, {
+            color: '#3498db',
             weight: 2,
             opacity: 0.8,
             smoothFactor: 1
         }).addTo(map);
-
-        const lastCoord = latLongs[latLongs.length - 1];
-        addRotatedPlaneMarker(lastCoord, heading);
 
         map.fitBounds(flightPath.getBounds());
     }

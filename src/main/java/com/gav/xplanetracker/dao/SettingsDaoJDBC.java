@@ -64,11 +64,15 @@ public class SettingsDaoJDBC {
             final String simbriefUsername = rs.getString("simbrief_username");
             final boolean useSimbriefApi = rs.getBoolean("use_navigraph_api");
             final String xPlaneHost = rs.getString("x_plane_host");
+            final boolean monitorScreenshots = rs.getBoolean("monitor_screenshots");
+            final String screenshotDir = rs.getString("screenshot_directory");
 
             return new ApplicationSettingsDTO(
                     simbriefUsername,
                     xPlaneHost,
-                    useSimbriefApi
+                    useSimbriefApi,
+                    monitorScreenshots,
+                    screenshotDir
             );
         } catch (SQLException e) {
             logger.error("Could not get settings from database from database", e);
@@ -78,12 +82,20 @@ public class SettingsDaoJDBC {
     }
 
     public void save(ApplicationSettingsDTO settings) {
-        final String SQL = "UPDATE settings SET simbrief_username = ?, use_navigraph_api = ?";
+        final String SQL = "UPDATE settings SET " +
+                            "simbrief_username = ?, " +
+                            "use_navigraph_api = ?, " +
+                            "x_plane_host = ?, " +
+                            "monitor_screenshots = ?, " +
+                            "screenshot_dir = ?";
 
         try (Connection connection = DatabaseConnection.connect()) {
             final PreparedStatement ps = connection.prepareStatement(SQL);
             ps.setString(1, settings.simbriefUsername());
             ps.setBoolean(2, settings.useNavigraphApi());
+            ps.setString(3, settings.xplaneHost());
+            ps.setBoolean(4, settings.monitorScreenshots());
+            ps.setString(5, settings.xPlaneScreenshotDirectory());
 
             ps.executeUpdate();
         } catch (SQLException e) {

@@ -1,12 +1,15 @@
 package com.gav.xplanetracker.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.gav.xplanetracker.dao.SettingsDaoJDBC;
 import com.gav.xplanetracker.dto.navigraph.NavigraphFlightPlan;
 import com.gav.xplanetracker.dto.navigraph.Waypoint;
+import com.gav.xplanetracker.model.Flight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +32,12 @@ public class NavigraphService {
     private final SettingsDaoJDBC settingsDao;
     private final HttpClient client;
     private final XmlMapper xmlMapper;
+    private final ObjectMapper objectMapper;
 
     public NavigraphService() {
         this.settingsDao = SettingsDaoJDBC.getInstance();
         this.client = HttpClient.newHttpClient();
+        this.objectMapper = new ObjectMapper();
         this.xmlMapper = new XmlMapper();
         configureXmlMapper();
     }
@@ -185,6 +190,14 @@ public class NavigraphService {
                          NavigraphService.class.getClassLoader().getResourceAsStream("test-data/simbrief.xml")) {
                 return xmlMapper.readTree(inputStream);
             }
+        }
+    }
+
+    public NavigraphFlightPlan getFlightPlan(Flight flight) {
+        try {
+            return objectMapper.readValue(flight.getNavigraphJson(), NavigraphFlightPlan.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

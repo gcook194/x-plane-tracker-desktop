@@ -12,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FlightService {
 
@@ -103,5 +101,9 @@ public class FlightService {
             logger.error("Error parsing navigraph flight plan as string: ", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Flight> getFlights() {
+        return flightDao.getFlightsByStatus(FlightStatus.COMPLETED);
     }
 }
