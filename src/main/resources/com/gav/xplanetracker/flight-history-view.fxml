@@ -30,17 +30,18 @@
                                       AnchorPane.leftAnchor="0.0"
                                       AnchorPane.rightAnchor="0.0"
                                       alignment="TOP_CENTER"
-                                      spacing="10"
-                                      styleClass="padded">
+                                      spacing="20"
+                                      styleClass="flight-details-container">
 
-                                    <VBox alignment="CENTER">
-                                        <ImageView fx:id="flightImage"
-                                                   preserveRatio="true"
-                                        />
-                                    </VBox>
+                                    <!-- Flight Image -->
+                                    <StackPane alignment="CENTER" styleClass="image-container" visible="true" managed="true">
+                                        <ImageView fx:id="flightImage" preserveRatio="true" fitWidth="600"/>
+                                    </StackPane>
+
+                                    <!-- Flight Header Info -->
                                     <VBox fx:id="flightInfoBox"
                                           alignment="CENTER"
-                                          spacing="5"
+                                          spacing="4"
                                           styleClass="flight-info-box"
                                           visible="false"
                                           managed="false">
@@ -49,27 +50,42 @@
                                         <Label fx:id="fullRouteLabel" styleClass="full-route"/>
                                     </VBox>
 
+                                    <!-- Flight Details Panel -->
                                     <VBox fx:id="flightDetailsBox"
                                           alignment="CENTER"
                                           visible="false"
                                           managed="false"
-                                          spacing="20">
+                                          spacing="16"
+                                          styleClass="details-panel">
 
+                                        <!-- Aircraft Info -->
                                         <HBox spacing="40" alignment="CENTER">
-                                            <VBox spacing="5" alignment="CENTER">
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
                                                 <Label text="Aircraft Type" styleClass="label-title"/>
                                                 <Label fx:id="aircraftType" styleClass="label-value"/>
                                             </VBox>
-
-                                            <VBox spacing="5" alignment="CENTER">
-                                                <Label text="Aircraft Reg" styleClass="label-title"/>
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Registration" styleClass="label-title"/>
                                                 <Label fx:id="aircraftReg" styleClass="label-value"/>
+                                            </VBox>
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Pushback Time" styleClass="label-title"/>
+                                                <Label fx:id="offBlockTime" styleClass="label-value"/>
+                                            </VBox>
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Arrived at Gate" styleClass="label-title"/>
+                                                <Label fx:id="arrivalTime" styleClass="label-value"/>
+                                            </VBox>
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Block Time" styleClass="label-title"/>
+                                                <Label fx:id="flightDuration" styleClass="label-value"/>
                                             </VBox>
                                         </HBox>
 
-                                        <VBox spacing="5" alignment="CENTER">
+                                        <!-- Route Info -->
+                                        <VBox spacing="3" alignment="CENTER_LEFT">
                                             <Label text="Route" styleClass="label-title"/>
-                                            <Label fx:id="flightRoute" styleClass="label-value" wrapText="true" />
+                                            <Label fx:id="flightRoute" styleClass="label-value" wrapText="true"/>
                                         </VBox>
                                     </VBox>
                                 </VBox>
