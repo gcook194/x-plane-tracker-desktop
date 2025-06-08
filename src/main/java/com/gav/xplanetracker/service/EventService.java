@@ -30,6 +30,7 @@ public class EventService {
     public static final String HEADING_DATAREF_NAME = "sim/flightmodel/position/mag_psi";
     public static final String ENGINES_RUNNING_DATAREF_NAME = "sim/flightmodel/engine/ENGN_running";
     public static final String TOTAL_FUEL_DATAREF_NAME = "sim/flightmodel/weight/m_fuel_total";
+    public static final String SIMULATOR_TIME_SECONDS = "sim/time/zulu_time_sec\t"; //Simulator time since midnight in seconds
 
     private static EventService INSTANCE;
 
@@ -64,6 +65,7 @@ public class EventService {
         event.setHeading(getHeading(dataRefs));
         event.setEnginesRunning(getEngineStatus(dataRefs));
         event.setFuelQuantity(getTotalFuel(dataRefs));
+        event.setSimTimeSeconds(getSimTimeSeconds(dataRefs));
         event.setCreatedAt(Instant.now());
         event.setFlightId(flight.getId());
 
@@ -86,7 +88,8 @@ public class EventService {
                 "&filter[name]=" + LONGITUDE_DATAREF_NAME +
                 "&filter[name]=" + HEADING_DATAREF_NAME +
                 "&filter[name]=" + ENGINES_RUNNING_DATAREF_NAME +
-                "&filter[name]=" + TOTAL_FUEL_DATAREF_NAME;
+                "&filter[name]=" + TOTAL_FUEL_DATAREF_NAME +
+                "&filter[name]=" + SIMULATOR_TIME_SECONDS;
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(datarefUri))
@@ -288,6 +291,33 @@ public class EventService {
             throw new RuntimeException("No total fuel returned from simulator API");
         } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching total fuel: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public double getSimTimeSeconds(XplaneDataRefListDTO dataRefs) {
+        final String simTimeSecondsDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(SIMULATOR_TIME_SECONDS))
+                .findAny()
+                .map(XplaneDataRefDTO::getId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(simTimeSecondsDataRefId)))
+                .GET()
+                .build();
+
+        try {
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
+
+            if (response != null) {
+                return Double.parseDouble(response.data());
+            }
+
+            throw new RuntimeException("No sim time returned from simulator API");
+        } catch (IOException | InterruptedException e) {
+            logger.error("Error when fetching sim time seconds: ", e);
             throw new RuntimeException(e);
         }
     }

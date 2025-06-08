@@ -63,7 +63,7 @@ public class ChartService {
 
                     series.setName("Fuel Quantity (KG)");
                     yAxis.setLabel("Fuel Quantity (KG)");
-                    chart.setTitle("Fuel Usage over flight duration");
+                    chart.setTitle("Fuel usage over flight duration");
                 }
                 default -> throw new IllegalStateException("Event type not supported");
             }

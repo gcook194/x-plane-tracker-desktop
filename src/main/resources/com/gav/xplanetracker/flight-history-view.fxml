@@ -98,14 +98,14 @@
                                 </VBox>
                             </AnchorPane>
                         </Tab>
-                        <Tab text="Flight Plan">
+                        <Tab text="Planned Route">
                             <AnchorPane>
                                 <VBox fx:id="simbriefRoutePanel">
                                     <!-- populated with web view -->
                                 </VBox>
                             </AnchorPane>
                         </Tab>
-                        <Tab text="Route">
+                        <Tab text="Actual Route">
                             <AnchorPane>
                                 <VBox fx:id="flightMapPanel">
                                     <!-- populated with web view -->

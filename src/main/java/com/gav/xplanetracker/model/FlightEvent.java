@@ -15,6 +15,7 @@ public class FlightEvent {
     private double heading;
     private boolean enginesRunning;
     private double fuelQuantity;
+    private double simTimeSeconds;
 
     public FlightEvent() {}
 
@@ -96,6 +97,14 @@ public class FlightEvent {
 
     public void setFuelQuantity(double fuelQuantity) {
         this.fuelQuantity = fuelQuantity;
+    }
+
+    public double getSimTimeSeconds() {
+        return simTimeSeconds;
+    }
+
+    public void setSimTimeSeconds(double simTimeSeconds) {
+        this.simTimeSeconds = simTimeSeconds;
     }
 
     @Override
