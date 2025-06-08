@@ -29,6 +29,7 @@ public class EventService {
     public static final String LONGITUDE_DATAREF_NAME = "sim/flightmodel/position/longitude";
     public static final String HEADING_DATAREF_NAME = "sim/flightmodel/position/mag_psi";
     public static final String ENGINES_RUNNING_DATAREF_NAME = "sim/flightmodel/engine/ENGN_running";
+    public static final String TOTAL_FUEL_DATAREF_NAME = "sim/flightmodel/weight/m_fuel_total";
 
     private static EventService INSTANCE;
 
@@ -62,6 +63,7 @@ public class EventService {
         event.setLongitude(getLongitude(dataRefs));
         event.setHeading(getHeading(dataRefs));
         event.setEnginesRunning(getEngineStatus(dataRefs));
+        event.setFuelQuantity(getTotalFuel(dataRefs));
         event.setCreatedAt(Instant.now());
         event.setFlightId(flight.getId());
 
@@ -83,7 +85,8 @@ public class EventService {
                 "&filter[name]=" + LATITUDE_DATAREF_NAME +
                 "&filter[name]=" + LONGITUDE_DATAREF_NAME +
                 "&filter[name]=" + HEADING_DATAREF_NAME +
-                "&filter[name]=" + ENGINES_RUNNING_DATAREF_NAME;
+                "&filter[name]=" + ENGINES_RUNNING_DATAREF_NAME +
+                "&filter[name]=" + TOTAL_FUEL_DATAREF_NAME;
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(datarefUri))
@@ -258,6 +261,33 @@ public class EventService {
             throw new RuntimeException("No heading returned from simulator API");
         } catch (IOException | InterruptedException e) {
             logger.error("Error when fetching tail number: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public double getTotalFuel(XplaneDataRefListDTO dataRefs) {
+        final String totalFuelDataRefId = dataRefs.getData().stream()
+                .filter(dataRef -> dataRef.getName().equals(TOTAL_FUEL_DATAREF_NAME))
+                .findAny()
+                .map(XplaneDataRefDTO::getId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(xPlaneDataRefReqUri(totalFuelDataRefId)))
+                .GET()
+                .build();
+
+        try {
+            final HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final XplaneApiResponse response = objectMapper.readValue(httpResponse.body(), XplaneApiResponse.class);
+
+            if (response != null) {
+                return Double.parseDouble(response.data());
+            }
+
+            throw new RuntimeException("No total fuel returned from simulator API");
+        } catch (IOException | InterruptedException e) {
+            logger.error("Error when fetching total fuel: ", e);
             throw new RuntimeException(e);
         }
     }

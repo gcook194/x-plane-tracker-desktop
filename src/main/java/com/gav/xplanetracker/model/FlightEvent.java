@@ -14,6 +14,7 @@ public class FlightEvent {
     private long flightId;
     private double heading;
     private boolean enginesRunning;
+    private double fuelQuantity;
 
     public FlightEvent() {}
 
@@ -89,15 +90,23 @@ public class FlightEvent {
         this.enginesRunning = enginesRunning;
     }
 
+    public double getFuelQuantity() {
+        return fuelQuantity;
+    }
+
+    public void setFuelQuantity(double fuelQuantity) {
+        this.fuelQuantity = fuelQuantity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         FlightEvent that = (FlightEvent) o;
-        return id == that.id && Double.compare(pressureAltitude, that.pressureAltitude) == 0 && Double.compare(latitude, that.latitude) == 0 && Double.compare(longitude, that.longitude) == 0 && Double.compare(groundSpeed, that.groundSpeed) == 0 && flightId == that.flightId && Double.compare(heading, that.heading) == 0 && enginesRunning == that.enginesRunning && Objects.equals(createdAt, that.createdAt);
+        return id == that.id && Double.compare(pressureAltitude, that.pressureAltitude) == 0 && Double.compare(latitude, that.latitude) == 0 && Double.compare(longitude, that.longitude) == 0 && Double.compare(groundSpeed, that.groundSpeed) == 0 && flightId == that.flightId && Double.compare(heading, that.heading) == 0 && enginesRunning == that.enginesRunning && fuelQuantity == that.fuelQuantity && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdAt, pressureAltitude, latitude, longitude, groundSpeed, flightId, heading, enginesRunning);
+        return Objects.hash(id, createdAt, pressureAltitude, latitude, longitude, groundSpeed, flightId, heading, enginesRunning, fuelQuantity);
     }
 }

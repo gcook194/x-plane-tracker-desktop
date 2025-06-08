@@ -58,6 +58,13 @@ public class ChartService {
                     yAxis.setLabel("Altitude (Ft)");
                     chart.setTitle("Altitude over flight duration");
                 }
+                case FUEL_QUANTITY -> {
+                    addDataPointToChart(events, series, FlightEvent::getFuelQuantity);
+
+                    series.setName("Fuel Quantity (KG)");
+                    yAxis.setLabel("Fuel Quantity (KG)");
+                    chart.setTitle("Fuel Usage over flight duration");
+                }
                 default -> throw new IllegalStateException("Event type not supported");
             }
 

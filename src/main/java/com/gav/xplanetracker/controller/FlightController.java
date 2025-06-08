@@ -121,6 +121,9 @@ public class FlightController {
     private VBox activeFlightSpeedPanel;
 
     @FXML
+    private VBox activeFlightFuelPanel;
+
+    @FXML
     public void initialize() {
         handleSimulatorState();
 
@@ -241,12 +244,14 @@ public class FlightController {
     private void loadFlightData(Flight flight) {
         activeFlightAltitudePanel.getChildren().clear();
         activeFlightSpeedPanel.getChildren().clear();
+        activeFlightFuelPanel.getChildren().clear();
 
         if (flight != null) {
             final List<FlightEvent> events = flightService.getFlightEvents(flight);
 
             chartService.drawLineGraph(activeFlightAltitudePanel, events, FlightEventType.DENSITY_ALTITUDE);
             chartService.drawLineGraph(activeFlightSpeedPanel, events, FlightEventType.GROUND_SPEED);
+            chartService.drawLineGraph(activeFlightFuelPanel, events, FlightEventType.FUEL_QUANTITY);
         }
     }
 
