@@ -29,8 +29,18 @@ public class FlightEventDaoJDBC {
     }
 
     public void create(final FlightEvent event) {
-        final String SQL = "INSERT INTO flight_event (flight_id, created_at, pressure_altitude, latitude, longitude, ground_speed, heading, engines_running) \n" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        final String SQL = "INSERT INTO flight_event (" +
+                "flight_id, " +
+                "created_at, " +
+                "pressure_altitude, " +
+                "latitude, " +
+                "longitude, " +
+                "ground_speed, " +
+                "heading, " +
+                "engines_running" +
+                "fuel_qty, " +
+                "sim_time_secs ) \n" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.connect()) {
             final PreparedStatement ps = connection.prepareStatement(SQL);
@@ -42,6 +52,8 @@ public class FlightEventDaoJDBC {
             ps.setDouble(6, event.getGroundSpeed());
             ps.setDouble(7, event.getHeading());
             ps.setBoolean(8, event.isEnginesRunning());
+            ps.setDouble(9, event.getFuelQuantity());
+            ps.setDouble(10, event.getSimTimeSeconds());
 
             final int rowsInserted = ps.executeUpdate();
 
@@ -75,6 +87,8 @@ public class FlightEventDaoJDBC {
                 event.setPressureAltitude(rs.getDouble("pressure_altitude"));
                 event.setHeading(rs.getDouble("heading"));
                 event.setEnginesRunning(rs.getBoolean("engines_running"));
+                event.setSimTimeSeconds(rs.getDouble("sim_time_secs"));
+                event.setFuelQuantity(rs.getDouble("fuel_qty"));
 
                 events.add(event);
             }
