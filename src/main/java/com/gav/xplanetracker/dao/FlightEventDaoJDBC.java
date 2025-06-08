@@ -37,7 +37,7 @@ public class FlightEventDaoJDBC {
                 "longitude, " +
                 "ground_speed, " +
                 "heading, " +
-                "engines_running" +
+                "engines_running, " +
                 "fuel_qty, " +
                 "sim_time_secs ) \n" +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

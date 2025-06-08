@@ -30,7 +30,7 @@ public class EventService {
     public static final String HEADING_DATAREF_NAME = "sim/flightmodel/position/mag_psi";
     public static final String ENGINES_RUNNING_DATAREF_NAME = "sim/flightmodel/engine/ENGN_running";
     public static final String TOTAL_FUEL_DATAREF_NAME = "sim/flightmodel/weight/m_fuel_total";
-    public static final String SIMULATOR_TIME_SECONDS = "sim/time/zulu_time_sec\t"; //Simulator time since midnight in seconds
+    public static final String SIMULATOR_TIME_SECONDS = "sim/time/zulu_time_sec"; //Simulator time since midnight in seconds
 
     private static EventService INSTANCE;
 
