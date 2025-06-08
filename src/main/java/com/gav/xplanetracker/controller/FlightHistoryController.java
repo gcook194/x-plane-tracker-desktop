@@ -77,6 +77,9 @@ public class FlightHistoryController {
     private VBox flightAltitudePanel;
 
     @FXML
+    private VBox flightFuelPanel;
+
+    @FXML
     private Label aircraftType;
 
     @FXML
@@ -224,8 +227,20 @@ public class FlightHistoryController {
         flightAltitudePanel.getChildren().clear();
         flightSpeedPanel.getChildren().clear();
 
+        flightFuelPanel.getChildren().clear();
+        flightFuelPanel.setVisible(false);
+        flightFuelPanel.setManaged(false);
+
         chartService.drawLineGraph(flightAltitudePanel, flightEvents, FlightEventType.DENSITY_ALTITUDE);
         chartService.drawLineGraph(flightSpeedPanel, flightEvents, FlightEventType.GROUND_SPEED);
+
+        // TODO do this in the service
+        final boolean fuelEventPresent = flightEvents.stream()
+                        .anyMatch(e -> e.getFuelQuantity() > 0);
+
+        if (fuelEventPresent) {
+            chartService.drawLineGraph(flightFuelPanel, flightEvents, FlightEventType.FUEL_QUANTITY);
+        }
     }
 
     private void loadFlightInfo(Flight flight) {

@@ -77,6 +77,8 @@ public class ChartService {
         chart.getData().add(series);
 
         chartContainer.getChildren().add(chart);
+        chartContainer.setVisible(true);
+        chartContainer.setManaged(true);
     }
 
     private void addDataPointToChart(List<FlightEvent> events, XYChart.Series<String, Number> series, Function<FlightEvent, Double> methodToCall) {

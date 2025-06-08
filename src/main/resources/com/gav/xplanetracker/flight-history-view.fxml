@@ -131,6 +131,15 @@
                                           maxWidth="Infinity">
                                         <!-- chart generated in back end -->
                                     </VBox>
+
+                                    <VBox fx:id="flightFuelPanel"
+                                          VBox.vgrow="ALWAYS"
+                                          maxHeight="Infinity"
+                                          maxWidth="Infinity">
+                                        <!-- chart generated in back end -->
+                                    </VBox>
+
+
                                 </VBox>
                             </AnchorPane>
                         </Tab>
