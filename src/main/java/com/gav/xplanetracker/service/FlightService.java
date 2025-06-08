@@ -154,7 +154,19 @@ public class FlightService {
 
         final Duration duration = Duration.between(offBlocksTime, onBlocksTime);
 
-        return String.format("%s:%s", duration.toHoursPart(), duration.toMinutesPart());
+        final StringBuilder sb = new StringBuilder();
+
+        if (duration.toHoursPart() > 0) {
+            final String hrsStr = duration.toHoursPart() < 2 ? "hr" : "hrs";
+            sb.append(String.format("%s %s ", duration.toHoursPart(), hrsStr));
+        }
+
+        if (duration.toMinutesPart() > 0) {
+            final String minsStr = duration.toMinutesPart() < 2 ? "min" : "mins";
+            sb.append(String.format("%s %s", duration.toMinutesPart(), minsStr));
+        }
+
+        return sb.toString();
     }
 
     public String getOffBlockTimeInSim(Flight flight) {
