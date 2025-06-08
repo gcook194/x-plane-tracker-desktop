@@ -110,7 +110,19 @@ public class FlightHistoryController {
     private Label arrivalTime;
 
     @FXML
+    private Label offBlockTimeSim;
+
+    @FXML
     private Label flightDistance;
+
+    @FXML
+    private Label arrivalTimeSim;
+
+    @FXML
+    private VBox offBlockTimeSimBox;
+
+    @FXML
+    private VBox arrivalTimeSimBox;
 
     @FXML
     private VBox flightInfoBox;
@@ -259,6 +271,13 @@ public class FlightHistoryController {
 
         final String arrivalTimeStr = flightService.getArrivalTime(flight);
         arrivalTime.setText(arrivalTimeStr);
+
+        final String offBlockTimeSimStr = flightService.getOffBlockTimeInSim(flight);
+        offBlockTimeSim.setText(offBlockTimeSimStr);
+
+        final String arrivalTimeSimStr = flightService.getArrivalInSim(flight);
+        arrivalTimeSim.setText(arrivalTimeSimStr);
+
 
         if (flight.getNavigraphJson() != null) {
             final NavigraphFlightPlan flightPlan = navigraphService.getFlightPlan(flight);

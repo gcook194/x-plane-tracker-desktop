@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -154,5 +155,43 @@ public class FlightService {
         final Duration duration = Duration.between(offBlocksTime, onBlocksTime);
 
         return String.format("%s:%s", duration.toHoursPart(), duration.toMinutesPart());
+    }
+
+    public String getOffBlockTimeInSim(Flight flight) {
+        return this.getFlightEvents(flight).stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .findFirst()
+                .map(event -> {
+                    final double seconds = event.getSimTimeSeconds();
+                    if (seconds == 0d) {
+                        return "N/A";
+                    }
+
+                    final LocalTime time = LocalTime.ofSecondOfDay((int)seconds);
+                    final DateTimeFormatter zuluFormatter = DateTimeFormatter.ofPattern("HH:mm'Z'")
+                            .withZone(ZoneOffset.UTC);
+
+                    return time.format(zuluFormatter);
+                })
+                .orElse("N/A");
+    }
+
+    public String getArrivalInSim(Flight flight) {
+        return this.getFlightEvents(flight).stream()
+                .filter(FlightEvent::isEnginesRunning)
+                .reduce((first, second) -> second)
+                .map(event -> {
+                    final double seconds = event.getSimTimeSeconds();
+                    if (seconds == 0d) {
+                        return "N/A";
+                    }
+
+                    final LocalTime time = LocalTime.ofSecondOfDay((int)seconds);
+                    final DateTimeFormatter zuluFormatter = DateTimeFormatter.ofPattern("HH:mm'Z'")
+                            .withZone(ZoneOffset.UTC);
+
+                    return time.format(zuluFormatter);
+                })
+                .orElse("N/A");
     }
 }

@@ -68,6 +68,19 @@
                                                 <Label text="Registration" styleClass="label-title"/>
                                                 <Label fx:id="aircraftReg" styleClass="label-value"/>
                                             </VBox>
+
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Block Time" styleClass="label-title"/>
+                                                <Label fx:id="flightDuration" styleClass="label-value"/>
+                                            </VBox>
+
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Distance (NM)" styleClass="label-title"/>
+                                                <Label fx:id="flightDistance" styleClass="label-value"/>
+                                            </VBox>
+                                        </HBox>
+
+                                        <HBox spacing="40" alignment="CENTER">
                                             <VBox spacing="3" alignment="CENTER_LEFT">
                                                 <Label text="Pushback Time" styleClass="label-title"/>
                                                 <Label fx:id="offBlockTime" styleClass="label-value"/>
@@ -76,16 +89,15 @@
                                                 <Label text="Arrived at Gate" styleClass="label-title"/>
                                                 <Label fx:id="arrivalTime" styleClass="label-value"/>
                                             </VBox>
-                                            <VBox spacing="3" alignment="CENTER_LEFT">
-                                                <Label text="Block Time" styleClass="label-title"/>
-                                                <Label fx:id="flightDuration" styleClass="label-value"/>
-                                            </VBox>
-                                        </HBox>
 
-                                        <HBox spacing="40" alignment="CENTER">
-                                            <VBox spacing="3" alignment="CENTER_LEFT">
-                                                <Label text="Distance (NM)" styleClass="label-title"/>
-                                                <Label fx:id="flightDistance" styleClass="label-value"/>
+                                            <VBox spacing="3" alignment="CENTER_LEFT" fx:id="offBlockTimeSimBox">
+                                                <Label text="Pushback Time (Sim)" styleClass="label-title"/>
+                                                <Label fx:id="offBlockTimeSim" styleClass="label-value"/>
+                                            </VBox>
+
+                                            <VBox spacing="3" alignment="CENTER_LEFT" fx:id="arrivalTimeSimBox">
+                                                <Label text="Arrived at Gate (Sim)" styleClass="label-title"/>
+                                                <Label fx:id="arrivalTimeSim" styleClass="label-value"/>
                                             </VBox>
                                         </HBox>
 
