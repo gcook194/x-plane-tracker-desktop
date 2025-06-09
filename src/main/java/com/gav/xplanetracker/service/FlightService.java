@@ -253,6 +253,10 @@ public class FlightService {
 
     public double getFlightProgress(Flight flight, int plannedDistance) {
         final double distanceTravelled = this.calculateDistanceTravelled(flight);
-        return (distanceTravelled / plannedDistance) * 100;
+        final double flightProgress = (distanceTravelled / plannedDistance);
+
+        logger.debug("Flight progress: {}", flightProgress);
+
+        return flightProgress;
     }
 }

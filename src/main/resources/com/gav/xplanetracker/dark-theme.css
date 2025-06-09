@@ -360,7 +360,7 @@
     -fx-padding: 3;
     -fx-border-radius: 5;
     -fx-border-color: #444444;
-    -fx-border-width: 1;
+    -fx-border-width: 0;
 }
 
 .progress-bar .bar {
