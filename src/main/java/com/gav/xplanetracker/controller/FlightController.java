@@ -7,13 +7,17 @@ import com.gav.xplanetracker.model.Flight;
 import com.gav.xplanetracker.model.FlightEvent;
 import com.gav.xplanetracker.model.MapOptions;
 import com.gav.xplanetracker.service.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +128,12 @@ public class FlightController {
     private VBox activeFlightFuelPanel;
 
     @FXML
+    private VBox flightProgressBox;
+
+    @FXML
+    private ProgressBar flightProgressBar;
+
+    @FXML
     public void initialize() {
         handleSimulatorState();
 
@@ -186,6 +196,8 @@ public class FlightController {
         flightInfoBox.setManaged(false);
         startFlight.setVisible(true);
         startFlight.setManaged(true);
+        flightProgressBox.setVisible(false);
+        flightProgressBox.setManaged(false);
 
         noActiveFlightView();
     }
@@ -204,6 +216,8 @@ public class FlightController {
         flightInfoBox.setManaged(false);
         startFlight.setVisible(true);
         startFlight.setManaged(true);
+        flightProgressBox.setVisible(false);
+        flightProgressBox.setManaged(false);
 
         noActiveFlightView();
     }
@@ -296,11 +310,34 @@ public class FlightController {
         final List<FlightEvent> events = flightService.getFlightEvents(flight);
         mapService.drawFlightRouteMap(webView, activeFlightMapPanel, events, actualRouteMapOptions);
         loadFlightData(flight);
+        loadFlightProgressBar(flight, navigraphFlightPlan);
     }
 
     private void noActiveFlightView() {
         mapService.drawBasicMap(webView, activeFlightMapPanel);
         mapService.drawBasicMap(navigraphWebView, navigraphMapPanel);
         loadFlightData(null);
+    }
+
+    private void loadFlightProgressBar(Flight flight, NavigraphFlightPlan navigraphFlightPlan) {
+        final int plannedDistance = navigraphService.getPlannedFlightDistance(navigraphFlightPlan);
+        final Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    double progress = flightService.getFlightProgress(flight, plannedDistance);
+                    flightProgressBar.setProgress(progress);
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        flightProgressBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) {
+                logger.info("Stopping flight progress updates");
+                timeline.stop();
+            }
+        });
+
+        flightProgressBox.setVisible(true);
+        flightProgressBox.setManaged(true);
     }
 }

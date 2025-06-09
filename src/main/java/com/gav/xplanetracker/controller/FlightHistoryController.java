@@ -119,10 +119,7 @@ public class FlightHistoryController {
     private Label arrivalTimeSim;
 
     @FXML
-    private VBox offBlockTimeSimBox;
-
-    @FXML
-    private VBox arrivalTimeSimBox;
+    private Label actualDistance;
 
     @FXML
     private VBox flightInfoBox;
@@ -278,6 +275,8 @@ public class FlightHistoryController {
         final String arrivalTimeSimStr = flightService.getArrivalInSim(flight);
         arrivalTimeSim.setText(arrivalTimeSimStr);
 
+        final String actualDistanceStr = Integer.toString(flightService.calculateDistanceTravelled(flight));
+        actualDistance.setText(actualDistanceStr);
 
         if (flight.getNavigraphJson() != null) {
             final NavigraphFlightPlan flightPlan = navigraphService.getFlightPlan(flight);

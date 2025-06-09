@@ -352,5 +352,22 @@
     -fx-font-size: 14px;
 }
 
+.progress-bar {
+    -fx-accent: #3498db;
+    -fx-control-inner-background: #2e2e2e;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+    -fx-padding: 3;
+    -fx-border-radius: 5;
+    -fx-border-color: #444444;
+    -fx-border-width: 1;
+}
+
+.progress-bar .bar {
+    -fx-background-color: #3498db;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+}
+
 
 ``

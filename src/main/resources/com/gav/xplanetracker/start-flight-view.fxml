@@ -38,6 +38,10 @@
                         <Label fx:id="fullRouteLabel" styleClass="full-route"/>
                     </VBox>
 
+                    <VBox fx:id="flightProgressBox" visible="false" managed="false" maxWidth="Infinity" spacing="5">
+                        <ProgressBar fx:id="flightProgressBar" maxWidth="Infinity" prefHeight="15"/>
+                    </VBox>
+
                     <!-- GridPane for flight data -->
                     <VBox fx:id="flightDetailsBox" visible="false" managed="false" spacing="10">
                         <GridPane hgap="20" vgap="10">

@@ -75,8 +75,13 @@
                                             </VBox>
 
                                             <VBox spacing="3" alignment="CENTER_LEFT">
-                                                <Label text="Distance (NM)" styleClass="label-title"/>
+                                                <Label text="Planned Distance (NM)" styleClass="label-title"/>
                                                 <Label fx:id="flightDistance" styleClass="label-value"/>
+                                            </VBox>
+
+                                            <VBox spacing="3" alignment="CENTER_LEFT">
+                                                <Label text="Actual Distance (NM)" styleClass="label-title"/>
+                                                <Label fx:id="actualDistance" styleClass="label-value"/>
                                             </VBox>
                                         </HBox>
 

@@ -206,4 +206,53 @@ public class FlightService {
                 })
                 .orElse("N/A");
     }
+
+    double haversine(double val) {
+        return Math.pow(Math.sin(val / 2), 2);
+    }
+
+    private double calculateDistance(double startLat, double startLong, double endLat, double endLong) {
+        final double EARTH_RADIUS = 3436.47;
+        double dLat = Math.toRadians((endLat - startLat));
+        double dLong = Math.toRadians((endLong - startLong));
+
+        startLat = Math.toRadians(startLat);
+        endLat = Math.toRadians(endLat);
+
+        double a = haversine(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversine(dLong);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
+    }
+
+    public int calculateDistanceTravelled(Flight flight) {
+        final List<FlightEvent> events = this.getFlightEvents(flight);
+        final ListIterator<FlightEvent> it = events.listIterator();
+
+        double distanceKilometres = 0d;
+
+        if (!events.isEmpty()) {
+            FlightEvent event = events.getFirst();
+
+            while (it.hasNext()) {
+                FlightEvent next = it.next();
+
+                distanceKilometres += calculateDistance(
+                        event.getLatitude(),
+                        event.getLongitude(),
+                        next.getLatitude(),
+                        next.getLongitude()
+                );
+
+                event = next;
+            }
+        }
+
+        return (int) distanceKilometres;
+    }
+
+    public double getFlightProgress(Flight flight, int plannedDistance) {
+        final double distanceTravelled = this.calculateDistanceTravelled(flight);
+        return (distanceTravelled / plannedDistance) * 100;
+    }
 }
