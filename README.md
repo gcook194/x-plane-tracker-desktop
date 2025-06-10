@@ -154,9 +154,6 @@ in the database so was quite happy to just write queries and map my own objects 
 ### No Unit Tests??? 
 I probably should and will add them. Nobody sits at home dying to write "clean code" or do TDD - they want to write cool things that do cool things.
 
-Also while we're on tests and TDD - I have met one person in my entire life who does actual, bonafide TDD. Why do we all lie about it 
-in interviews and why do organisations pretend all their devs do it?
-
 I know pretty much every line of code in the application...since I wrote it all...so fixing bugs isn't super time consuming. 
 The application is simple enough that a quick test flight will uncover any show stoppers. 
 
@@ -177,8 +174,4 @@ the application is installed it will run migrations and update the SQLite schema
 I tried to use the modular approach when packaging the app but so many of the dependencies just flat out don't support it and auto 
 modules (as far as I understand them) didn't work either. I found 
 [this fantastic tutorial by mbachmann](https://github.com/mbachmann/java-11-fx-non-modular/tree/master?tab=readme-ov-file#jpackage-for-platform-dependant-setup-macos-or-windows)
-on packaging non-modular Java FX apps and it worked great. 
-
-### Disclaimer
-I obviously never set out to write bad code - and I don't think there is much of it in this app - but this started as a quick project to play around
-with the X-Plane REST API and grew arms and legs. I've cut some corners and thrown this together in about 3-4 weeks in the evenings after work.
+on packaging non-modular Java FX apps and it worked great.
