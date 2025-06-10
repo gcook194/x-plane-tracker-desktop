@@ -12,6 +12,8 @@ or ORM frameworks.
 
 I know I could have written it using TypeScript and Electron but I hate myself, so chose not to. 
 
+[If you want to skip the functionality section and read a ramble about the architecture then click here](#Architecture) 
+
 ## Functionality
 
 The application currently offers the following functionality: 
@@ -132,6 +134,13 @@ is spent writing Java so I was quite happy using it in place of something like T
 I may go back and build the app using that tech stack but for what I wanted to achieve JavaFX was fine and actually I
 was surprised at how much I have enjoyed working with it. Its really not too different from writing web apps in the sense
 that the view system is markup based and you can use CSS to style it. 
+
+### MVC 
+The project is built using an MVC structure so for the most part, Controller classes only control view related traffic and data,
+service level classes contain all the important logic and dao/model classes contain all the logic related to fetching, changing and holding data.
+
+Service and DAO level classes are singletons and can be instantiated or fetched using the `getInstance` method. Doing this with controllers 
+seemed to break JavaFX so that layer is mostly managed by the Framework. 
 
 ### No IOC Framework, DI or ORMs? 
 The vast majority of my day job consists of writing REST APIs and a lot of the time I feel like I am a digital plumber
