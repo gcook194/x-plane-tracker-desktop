@@ -20,6 +20,7 @@ import java.util.*;
 
 public class FlightService {
 
+    private static final double EARTH_RADIUS_NAUTICAL_MILES = 3436.47;
     private static final Logger logger = LoggerFactory.getLogger(FlightService.class);
 
     private static FlightService INSTANCE;
@@ -212,7 +213,6 @@ public class FlightService {
     }
 
     private double calculateDistance(double startLat, double startLong, double endLat, double endLong) {
-        final double EARTH_RADIUS = 3436.47;
         double dLat = Math.toRadians((endLat - startLat));
         double dLong = Math.toRadians((endLong - startLong));
 
@@ -222,7 +222,7 @@ public class FlightService {
         double a = haversine(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversine(dLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return EARTH_RADIUS * c;
+        return EARTH_RADIUS_NAUTICAL_MILES * c;
     }
 
     public int calculateDistanceTravelled(Flight flight) {
