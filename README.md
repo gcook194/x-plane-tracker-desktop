@@ -74,7 +74,7 @@ The right hand side of the screen currently contains three tabs:
 - Active Flight Progress: Contains a second map with the flight's real-time progress plotted on it as well as an icon indicating the aircraft's current heading.
 - Active Flight Data: Contains three line graphs displaying the aircraft's altitude, ground speed and fuel quantity over the duration of the flight. 
 
-### Navigraph Flight Plan
+#### Navigraph Flight Plan
 The active flight plan map contains Simbrief flight information only. This includes route information and waypoint information.  
 Each waypoint can be clicked to open a popup containing further information about it. 
 
@@ -83,7 +83,7 @@ Also a general update to the look and feel to help users differentiate between S
 
 ![navigraph-flight-plan.png](screenshots/navigraph-flight-plan.png)
 
-### Active Flight Progress
+#### Active Flight Progress
 The active flight progress map contains a route that is depicted from actual simulator data, as well as a SVG aircraft 
 icon that allows the user to quickly see which heading the aircraft is currently on. 
 
@@ -92,12 +92,23 @@ The plan going forward would be to overlay waypoint information and potentially 
 
 ![active-flight-progress.png](screenshots/active-flight-progress.png)
 
-### Active Flight Data 
+#### Active Flight Data 
 The active flight data tab contains three line graphs that display the altitude, speed and fuel quantity across the duration 
 of the flight. The plan going forward would be to derive some more complex data points and draw these into graphs and charts - 
 potentially things such as fuel burn per hour, etc. 
 
 ![active-flight-data.png](screenshots/active-flight-data.png)
+
+### No Active Flight
+If there is no active flight detected then the application will present the user with a button allowing them to start one.
+
+This screen was a bit quick and dirty and will be revised in future to give more options on how flight information is entered.
+It currently automatically fetches the user's most recent Simbrief flight and uses this data. 
+So ideally the user flow would be: 
+
+__Generate flight in Simbrief -> Start Simulator and load aircraft at airport -> Once loaded press "Start Flight" button__
+
+![dashboard-no-active-flight.png](screenshots/dashboard-no-active-flight.png)
 
 ## Flight History
 The flight history page contains a selectable list of all the user's previously tracked flights. It acts in much the same

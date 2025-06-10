@@ -133,6 +133,8 @@ public class FlightController {
     @FXML
     private ProgressBar flightProgressBar;
 
+    private Timeline timeline;
+
     @FXML
     public void initialize() {
         handleSimulatorState();
@@ -314,6 +316,9 @@ public class FlightController {
     }
 
     private void noActiveFlightView() {
+        if (timeline != null) {
+            timeline.stop();
+        }
         mapService.drawBasicMap(webView, activeFlightMapPanel);
         mapService.drawBasicMap(navigraphWebView, navigraphMapPanel);
         loadFlightData(null);
@@ -321,7 +326,7 @@ public class FlightController {
 
     private void loadFlightProgressBar(Flight flight, NavigraphFlightPlan navigraphFlightPlan) {
         final int plannedDistance = navigraphService.getPlannedFlightDistance(navigraphFlightPlan);
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(Duration.seconds(5), event -> {
                     double progress = flightService.getFlightProgress(flight, plannedDistance);
                     flightProgressBar.setProgress(progress);
