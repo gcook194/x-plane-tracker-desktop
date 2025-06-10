@@ -120,3 +120,56 @@ on this screen.
 
 ![flight-history.png](screenshots/flight-history.png)
 
+## Architecture
+Now that the screenshots are out the way its time to discuss the code - the hows, the whys and the wtfs. 
+Prepare for a stream of consciousness. 
+
+### JavaFX 
+I chose to build the application in JavaFX because I'd always wanted to give it a try but never had the opportunity.
+I understand that its not massively popular in the desktop application space anymore but most of my time during the day
+is spent writing Java so I was quite happy using it in place of something like TypeScript and Electron.
+
+I may go back and build the app using that tech stack but for what I wanted to achieve JavaFX was fine and actually I
+was surprised at how much I have enjoyed working with it. Its really not too different from writing web apps in the sense
+that the view system is markup based and you can use CSS to style it. 
+
+### No IOC Framework, DI or ORMs? 
+The vast majority of my day job consists of writing REST APIs and a lot of the time I feel like I am a digital plumber
+rather than a software engineer. Spring magic handles resource creation, JPA handles increasingly more complex queries, etc. 
+So I thought it would be nice to just go back to basics and write all my own SQL and perform all my own "autowiring" 
+(read as making classes singletons and calling a `getInstance` method on them). 
+
+The first year of my career as an apprentice was spent writing SQL reports and fixing data bugs. I grew to really like working 
+in the database so was quite happy to just write queries and map my own objects instead of letting an ORM have all the fun.
+
+### No Unit Tests??? 
+I probably should and will add them. Nobody sits at home dying to write "clean code" or do TDD - they want to write cool things that do cool things.
+
+Also while we're on tests and TDD - I have met one person in my entire life who does actual, bonafide TDD. Why do we all lie about it 
+in interviews and why do organisations pretend all their devs do it?
+
+I know pretty much every line of code in the application...since I wrote it all...so fixing bugs isn't super time consuming. 
+The application is simple enough that a quick test flight will uncover any show stoppers. 
+
+... I'll add tests eventually. 
+
+### SQLite 
+I did initially consider storing data in the cloud and started writing an AWS Lambda to process events being sent but it was too similar to
+what I spend my time doing at work so I wanted to try something different. The benefit of using SQLite stored locally on the user's
+machine is that I don't need to pay for data storage. The only data that ever leaves the user's machine is their Simbrief username
+and this needs to be sent in plain text because thats what the Simbrief API wants. 
+
+### Flyway 
+I'm not sure if this is a "production ready" approach because I've never written a desktop app, but if a new version of 
+the application is installed it will run migrations and update the SQLite schema on the user's machine 
+(if there are any migrations to perform). I quite like the simplicity of this. 
+
+### MVN Shade Plugin and Fat JAR files
+I tried to use the modular approach when packaging the app but so many of the dependencies just flat out don't support it and auto 
+modules (as far as I understand them) didn't work either. I found 
+[this fantastic tutorial by mbachmann](https://github.com/mbachmann/java-11-fx-non-modular/tree/master?tab=readme-ov-file#jpackage-for-platform-dependant-setup-macos-or-windows)
+on packaging non-modular Java FX apps and it worked great. 
+
+### Disclaimer
+I obviously never set out to write bad code - and I don't think there is much of it in this app - but this started as a quick project to play around
+with the X-Plane REST API and grew arms and legs. I've cut some corners and thrown this together in about 3-4 weeks in the evenings after work.
