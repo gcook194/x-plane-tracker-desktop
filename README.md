@@ -152,12 +152,10 @@ The first year of my career as an apprentice was spent writing SQL reports and f
 in the database so was quite happy to just write queries and map my own objects instead of letting an ORM have all the fun.
 
 ### No Unit Tests??? 
-I probably should and will add them. Nobody sits at home dying to write "clean code" or do TDD - they want to write cool things that do cool things.
-
 I know pretty much every line of code in the application...since I wrote it all...so fixing bugs isn't super time consuming. 
-The application is simple enough that a quick test flight will uncover any show stoppers. 
+The application is simple enough that a quick test flight will uncover any showstoppers. 
 
-... I'll add tests eventually. 
+... I'll add tests eventually, promise. 
 
 ### SQLite 
 I did initially consider storing data in the cloud and started writing an AWS Lambda to process events being sent but it was too similar to

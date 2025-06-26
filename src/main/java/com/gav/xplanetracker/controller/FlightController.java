@@ -325,14 +325,14 @@ public class FlightController {
     }
 
     private void loadFlightProgressBar(Flight flight, NavigraphFlightPlan navigraphFlightPlan) {
+        flightProgressBox.setVisible(true);
+        flightProgressBox.setManaged(true);
+
         final int plannedDistance = navigraphService.getPlannedFlightDistance(navigraphFlightPlan);
         timeline = new Timeline(
-                new KeyFrame(Duration.seconds(5), event -> {
+                new KeyFrame(Duration.seconds(1), event -> {
                     double progress = flightService.getFlightProgress(flight, plannedDistance);
                     flightProgressBar.setProgress(progress);
-
-                    flightProgressBox.setVisible(true);
-                    flightProgressBox.setManaged(true);
                 })
         );
         timeline.setCycleCount(Timeline.INDEFINITE);
