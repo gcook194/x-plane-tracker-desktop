@@ -83,7 +83,7 @@ Each waypoint can be clicked to open a popup containing further information abou
 The plan is to expand this map and eventually include alternate airport info and ETOPS info if applicable. 
 Also a general update to the look and feel to help users differentiate between SID, STAR, TOC, TOD, Departure and Arrival airports is planned. 
 
-![navigraph-flight-plan.png](screenshots/navigraph-flight-plan.png)
+![navigraph-flight-plan.png](screenshots/navigraph-flight-progress.png)
 
 #### Active Flight Progress
 The active flight progress map contains a route that is depicted from actual simulator data, as well as a SVG aircraft 
