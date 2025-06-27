@@ -173,3 +173,6 @@ I tried to use the modular approach when packaging the app but so many of the de
 modules (as far as I understand them) didn't work either. I found 
 [this fantastic tutorial by mbachmann](https://github.com/mbachmann/java-11-fx-non-modular/tree/master?tab=readme-ov-file#jpackage-for-platform-dependant-setup-macos-or-windows)
 on packaging non-modular Java FX apps and it worked great.
+
+## Known issues
+Known issues can be found on the [Github issues page](https://github.com/gcook194/x-plane-tracker-desktop/issues?q=is%3Aissue%20state%3Aopen%20label%3Abug)
